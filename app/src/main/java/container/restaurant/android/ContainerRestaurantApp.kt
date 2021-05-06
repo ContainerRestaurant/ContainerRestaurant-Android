@@ -7,7 +7,7 @@ import org.koin.core.context.startKoin
 import timber.log.Timber
 
 class ContainerRestaurantApp : Application() {
-
+//test
     override fun onCreate() {
         super.onCreate()
 
