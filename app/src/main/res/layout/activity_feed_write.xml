@@ -363,7 +363,6 @@
                         style="@style/TextAppearance.App.B.Gray07"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:onClick="onAddMainMenu"
                         android:text="@string/add_menu"
                         android:textSize="14sp" />
 
@@ -442,7 +441,6 @@
                         style="@style/TextAppearance.App.B.Gray07"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:onClick="onAddSideMenu"
                         android:text="@string/add_menu"
                         android:textSize="14sp" />
 
