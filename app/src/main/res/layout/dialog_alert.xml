@@ -133,7 +133,7 @@
                     android:backgroundTint="@color/gray_05"
                     android:includeFontPadding="false"
                     android:text="Cancel"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/gray_06"
                     android:visibility="gone" />
 
                 <com.google.android.material.button.MaterialButton
@@ -142,7 +142,7 @@
                     android:layout_height="50dp"
                     android:includeFontPadding="false"
                     android:text="Confirm"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/gray_06"
                     android:visibility="gone" />
 
             </LinearLayout>
