@@ -13,6 +13,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.asLiveData
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.naver.maps.geometry.Tm128
 import container.restaurant.android.R
 import container.restaurant.android.presentation.base.BaseActivity
 import container.restaurant.android.data.db.MainFood
@@ -36,7 +37,11 @@ class FeedWriteActivity : BaseActivity(), View.OnClickListener {
     private lateinit var binding: ActivityFeedWriteBinding
     private val viewModel: FeedWriteViewModel by viewModel()
     private val bottomSheetFragment = FeedWriteBottomSheetFragment {
-        restaurantCreateDto = FeedWriteRequest.RestaurantCreateDto(name = it.title, address = it.address, latitude = it.mapx.toDouble(), longitude = it.mapy.toDouble())
+
+        val tm128 = Tm128(it.mapx.toDouble(), it.mapy.toDouble())
+        val latLng = tm128.toLatLng()
+
+        restaurantCreateDto = FeedWriteRequest.RestaurantCreateDto(name = it.title, address = it.address, latitude = latLng.latitude, longitude = latLng.longitude)
         binding.etSearchContainer.text = CommUtils.fromHtml(it.title)
     }
     private val mainFoodAdapter = MainFoodAdapter()
