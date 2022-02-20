@@ -14,7 +14,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 
 internal val BASE_URL = if (BuildConfig.DEBUG) {
-    "http://ec2-52-78-66-184.ap-northeast-2.compute.amazonaws.com/"
+    "http://dev.hellozin.net"
 } else {
     ""
 }
