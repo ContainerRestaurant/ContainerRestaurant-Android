@@ -139,12 +139,23 @@ internal class HomeFragment : Fragment() {
         )
         dialog.setMultiEventListener(object : SimpleConfirmDialog.MultiEventListener {
             override fun onRightBtnClick(dialogSelf: SimpleConfirmDialog) {
+                // 로그인 성공 했을 때 동작
+                val onSignInSuccess: (UserInfoResponse) -> Unit = {
+                    lifecycleScope.launchWhenCreated {
+                        viewModel.getHomeInfo()
+                    }
+                }
                 dialogSelf.dismiss()
                 if (!viewModel.isUserSignIn()) {
-                    KakaoSignInDialogFragment().show(
-                        childFragmentManager,
-                        "KakaoSignInDialogFragment"
-                    )
+                    KakaoSignInDialogFragment(
+                        onSignInSuccess = onSignInSuccess,
+                        onClose = { parentFragment?.parentFragmentManager?.popBackStack() }
+                    ).apply {
+                        show(
+                            childFragmentManager,
+                            tag
+                        )
+                    }
                 } else {
                     feedWriteResultLauncher.launch(Intent(requireContext(), FeedWriteActivity::class.java))
                 }
@@ -175,17 +186,9 @@ internal class HomeFragment : Fragment() {
 
         // 프로젝트에 저장된 토큰 없을 때
         if (!authViewModel.isUserSignIn()) {
-            val kakaoSignInDialogFragment = KakaoSignInDialogFragment()
-            kakaoSignInDialogFragment.setOnCloseListener(object : OnCloseListener {
-                override fun onClose() {
-                    parentFragment?.parentFragmentManager?.popBackStack()
-                }
-            })
-            observeKakaoFragmentData(
-                requireActivity(),
-                kakaoSignInDialogFragment,
-                signUpResultLauncher,
-                onSignInSuccess
+            val kakaoSignInDialogFragment = KakaoSignInDialogFragment(
+                onSignInSuccess = onSignInSuccess,
+                onClose = { parentFragment?.parentFragmentManager?.popBackStack() }
             )
             kakaoSignInDialogFragment.show(childFragmentManager, kakaoSignInDialogFragment.tag)
 

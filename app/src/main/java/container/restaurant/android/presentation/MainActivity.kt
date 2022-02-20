@@ -1,6 +1,5 @@
 package container.restaurant.android.presentation
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
@@ -89,14 +88,11 @@ internal class MainActivity : BaseActivity() {
         // 프로젝트에 저장된 토큰 없을 때
         if (!authViewModel.isUserSignIn()) {
             Timber.d("user not signIn")
-            val kakaoSignInDialogFragment = KakaoSignInDialogFragment()
-            observeKakaoFragmentData(
-                this@MainActivity,
-                kakaoSignInDialogFragment,
-                signUpResultLauncher,
-                onSignInSuccess
+            val kakaoSignInDialogFragment = KakaoSignInDialogFragment(
+                onSignInSuccess = onSignInSuccess,
+                onClose = {}
             )
-            kakaoSignInDialogFragment.show(supportFragmentManager, "KakaoSignInDialogFragment")
+            kakaoSignInDialogFragment.show(supportFragmentManager, kakaoSignInDialogFragment.tag)
 
             observeAuthViewModelUserInfo(
                 this@MainActivity,

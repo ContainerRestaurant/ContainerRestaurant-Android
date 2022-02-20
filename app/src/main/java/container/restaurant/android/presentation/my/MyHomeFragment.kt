@@ -10,7 +10,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import container.restaurant.android.R
 import container.restaurant.android.data.response.UserInfoResponse
 import container.restaurant.android.databinding.FragmentMyHomeBinding
 import container.restaurant.android.presentation.auth.AuthViewModel
@@ -82,17 +81,9 @@ class MyHomeFragment : BaseFragment() {
 
         // 프로젝트에 저장된 토큰 없을 때
         if (!authViewModel.isUserSignIn()) {
-            val kakaoSignInDialogFragment = KakaoSignInDialogFragment()
-            kakaoSignInDialogFragment.setOnCloseListener(object : OnCloseListener {
-                override fun onClose() {
-                    parentFragment?.parentFragmentManager?.popBackStack()
-                }
-            })
-            observeKakaoFragmentData(
-                requireActivity(),
-                kakaoSignInDialogFragment,
-                signUpResultLauncher,
-                onSignInSuccess = onSignInSuccess
+            val kakaoSignInDialogFragment = KakaoSignInDialogFragment(
+                onSignInSuccess = onSignInSuccess,
+                onClose = { parentFragment?.parentFragmentManager?.popBackStack() }
             )
             kakaoSignInDialogFragment.show(childFragmentManager, kakaoSignInDialogFragment.tag)
 

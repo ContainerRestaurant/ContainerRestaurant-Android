@@ -1,23 +1,27 @@
 package container.restaurant.android.presentation.auth
 
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
 import container.restaurant.android.R
+import container.restaurant.android.data.response.UserInfoResponse
 import container.restaurant.android.databinding.FragmentKakaoSigninBinding
 import container.restaurant.android.util.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 
-class KakaoSignInDialogFragment : DialogFragment() {
+class KakaoSignInDialogFragment(val onSignInSuccess:(UserInfoResponse)->Unit,val onClose:() -> Unit) : DialogFragment() {
 
     private lateinit var binding: FragmentKakaoSigninBinding
     val viewModel: AuthViewModel by viewModel()
@@ -25,11 +29,6 @@ class KakaoSignInDialogFragment : DialogFragment() {
     private lateinit var provider: String
     private lateinit var kakaoAccessToken: String
 
-    private var onCloseListener: OnCloseListener? = null
-
-    fun setOnCloseListener(onCloseListener: OnCloseListener) {
-        this.onCloseListener = onCloseListener
-    }
 
     private val kakaoUserApi by lazy {
         UserApiClient.instance
@@ -88,13 +87,36 @@ class KakaoSignInDialogFragment : DialogFragment() {
                 Toast.makeText(requireContext(), getString(it), Toast.LENGTH_LONG).show()
                 this@KakaoSignInDialogFragment.dismiss()
             })
+            isGenerateAccessTokenSuccess.observe(viewLifecycleOwner) {
+                val signUpResultLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
+                    ActivityResultContracts.StartActivityForResult()
+                ) {
+                }
+                requireActivity().lifecycleScope.launchWhenCreated {
+                    signInWithAccessToken(
+                        onNicknameNull = {
+                            signUpResultLauncher.launch(
+                                Intent(
+                                    requireActivity(),
+                                    SignUpActivity::class.java
+                                )
+                            )
+                            dismiss()
+                        },
+                        onSignInSuccess = {
+                            onSignInSuccess(it)
+                            dismiss()
+                        }
+                    )
+                }
+            }
         }
     }
 
     //다이얼로그 바깥 쪽 터치 시 호출됨
     override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
-        onCloseListener?.onClose()
+        onClose()
     }
 
     private fun kakaoLogin() {
@@ -112,7 +134,7 @@ class KakaoSignInDialogFragment : DialogFragment() {
 
         //dismiss 는 cancel 과 다른 것 확인함!
         binding.imgClose.setOnClickListener {
-            onCloseListener?.onClose()
+            onClose()
             dismissAllowingStateLoss()
         }
     }
