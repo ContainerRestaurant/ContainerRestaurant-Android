@@ -7,26 +7,25 @@ import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import container.restaurant.android.R
 import container.restaurant.android.databinding.FragmentMyFeedBinding
 import container.restaurant.android.presentation.base.BaseFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class MyFeedFragment : BaseFragment() {
+class MyFeedFragment : BaseFragment<FragmentMyFeedBinding, MyViewModel>() {
 
     private lateinit var binding: FragmentMyFeedBinding
 
-    private val viewModel: MyViewModel by viewModel()
+    override val layoutResId: Int = R.layout.fragment_my_feed
+    override val viewModel: MyViewModel by viewModel()
 
     private val args: MyFeedFragmentArgs by navArgs()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,savedInstanceState: Bundle?): View {
-        binding = FragmentMyFeedBinding.inflate(inflater, container, false)
-        context ?: return binding.root
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewDataBinding.viewModel = viewModel
         setBindItem()
         getMyFeedList()
-
-        return binding.root
     }
 
     private fun setBindItem() {

@@ -16,44 +16,54 @@ import container.restaurant.android.presentation.auth.AuthViewModel
 import container.restaurant.android.presentation.auth.KakaoSignInDialogFragment
 import container.restaurant.android.presentation.auth.SignUpActivity
 import timber.log.Timber
+import java.util.regex.Pattern
 
-/**
- * 이미 프로젝트에 저장된 토큰, 아이디가 없을 때
- **/
-fun observeKakaoFragmentData(
-    fragmentActivity: FragmentActivity,
-    kakaoSignInDialogFragment: KakaoSignInDialogFragment,
-    signUpResultLauncher: ActivityResultLauncher<Intent>,
-    onSignInSuccess: (UserInfoResponse) -> Unit
-) {
-    fragmentActivity.lifecycleScope.launchWhenCreated {
-        kakaoSignInDialogFragment.whenCreated {
-            with(kakaoSignInDialogFragment.viewModel) {
-                isGenerateAccessTokenSuccess.observe(fragmentActivity, object: Observer<Void> {
-                    override fun onChanged(t: Void?) {
-                        fragmentActivity.lifecycleScope.launchWhenCreated {
-                            signInWithAccessToken(
-                                onNicknameNull = {
-                                    signUpResultLauncher.launch(
-                                        Intent(
-                                            fragmentActivity,
-                                            SignUpActivity::class.java
-                                        ))
-                                    kakaoSignInDialogFragment.dismiss()
-                                },
-                                onSignInSuccess = {
-                                    onSignInSuccess(it)
-                                    kakaoSignInDialogFragment.dismiss()
-                                }
-                            )
-                        }
-                        // 옵저빙 뒤에는 현재 옵저버를 제거해줌
-                        isGenerateAccessTokenSuccess.removeObserver(this)
-                    }
-                })
-            }
-        }
+class ValidationCheck {
+    companion object {
+        const val MIN_LENGTH = 2
+        const val MAX_LENGTH = 20
+        val impossibleLetterPattern: Pattern = Pattern.compile("[^가-힣a-zA-Z\\d ]")
+        val koreanPattern: Pattern = Pattern.compile("[가-힣]")
+        val enNumSpacePattern: Pattern = Pattern.compile("[a-zA-Z\\d ]")
     }
+}
+
+fun letterValidationCheck(string: String): Boolean {
+    val matcher = ValidationCheck.impossibleLetterPattern.matcher(string)
+    if (matcher.find()) return false
+    return true
+}
+
+fun lengthLongValidationCheck(string: String): Boolean {
+    var length = 0
+    val koreanMatcher = ValidationCheck.koreanPattern.matcher(string)
+    while (koreanMatcher.find()) {
+        length++
+        if (length > ValidationCheck.MAX_LENGTH) return false
+    }
+
+    val enNumSpaceMatcher = ValidationCheck.enNumSpacePattern.matcher(string)
+    while (enNumSpaceMatcher.find()) {
+        length++
+        if (length > ValidationCheck.MAX_LENGTH) return false
+    }
+    return true
+}
+
+fun lengthShortValidationCheck(string: String): Boolean {
+    var length = 0
+    val koreanMatcher = ValidationCheck.koreanPattern.matcher(string)
+    while (koreanMatcher.find()) {
+        length += 2
+        if (length >= ValidationCheck.MIN_LENGTH) return true
+    }
+
+    val enNumSpaceMatcher = ValidationCheck.enNumSpacePattern.matcher(string)
+    while (enNumSpaceMatcher.find()) {
+        length++
+        if (length >= ValidationCheck.MIN_LENGTH) return true
+    }
+    return false
 }
 
 /**

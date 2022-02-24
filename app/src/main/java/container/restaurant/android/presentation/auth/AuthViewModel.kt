@@ -12,8 +12,10 @@ import container.restaurant.android.data.request.UpdateProfileRequest
 import container.restaurant.android.data.response.NicknameDuplicationCheckResponse
 import container.restaurant.android.data.response.ProfileResponse
 import container.restaurant.android.data.response.UserInfoResponse
+import container.restaurant.android.presentation.base.BaseViewModel
 import container.restaurant.android.util.Event
 import container.restaurant.android.util.SingleLiveEvent
+import container.restaurant.android.util.ValidationCheck
 import container.restaurant.android.util.handleApiResponse
 import kotlinx.coroutines.flow.collect
 import timber.log.Timber
@@ -22,17 +24,7 @@ import java.util.regex.Pattern
 class AuthViewModel(
     private val prefStorage: PrefStorage,
     private val authRepository: AuthRepository
-) : ViewModel() {
-
-    private class ValidationCheck {
-        companion object {
-            const val MIN_LENGTH = 2
-            const val MAX_LENGTH = 20
-            val impossibleLetterPattern: Pattern = Pattern.compile("[^가-힣a-zA-Z\\d ]")
-            val koreanPattern: Pattern = Pattern.compile("[가-힣]")
-            val enNumSpacePattern: Pattern = Pattern.compile("[a-zA-Z\\d ]")
-        }
-    }
+) : BaseViewModel() {
 
     val userInfoResponse = MutableLiveData<UserInfoResponse>()
     val infoMessage = MutableLiveData<String>()
@@ -75,43 +67,6 @@ class AuthViewModel(
         _isCompleteButtonClicked.value = Event(true)
     }
 
-    fun letterValidationCheck(string: String): Boolean {
-        val matcher = ValidationCheck.impossibleLetterPattern.matcher(string)
-        if (matcher.find()) return false
-        return true
-    }
-
-    fun lengthLongValidationCheck(string: String): Boolean {
-        var length = 0
-        val koreanMatcher = ValidationCheck.koreanPattern.matcher(string)
-        while (koreanMatcher.find()) {
-            length++
-            if (length > ValidationCheck.MAX_LENGTH) return false
-        }
-
-        val enNumSpaceMatcher = ValidationCheck.enNumSpacePattern.matcher(string)
-        while (enNumSpaceMatcher.find()) {
-            length++
-            if (length > ValidationCheck.MAX_LENGTH) return false
-        }
-        return true
-    }
-
-    fun lengthShortValidationCheck(string: String): Boolean {
-        var length = 0
-        val koreanMatcher = ValidationCheck.koreanPattern.matcher(string)
-        while (koreanMatcher.find()) {
-            length += 2
-            if (length >= ValidationCheck.MIN_LENGTH) return true
-        }
-
-        val enNumSpaceMatcher = ValidationCheck.enNumSpacePattern.matcher(string)
-        while (enNumSpaceMatcher.find()) {
-            length++
-            if (length >= ValidationCheck.MIN_LENGTH) return true
-        }
-        return false
-    }
 
     suspend fun nicknameDuplicationCheck(nickname: String) {
         Timber.d("AuthViewModel nicknameDuplicationCheck called")
@@ -161,15 +116,16 @@ class AuthViewModel(
             provider = provider,
             accessToken = accessToken
         ).collect { response ->
-            when (response) {
-                is ApiResponse.Success -> {
-                    if (response.data?.token != null && response.data?.id != null) {
-                        storeUserTokenAndId("Bearer ${response.data?.token}", response.data?.id!!)
+            handleApiResponse(
+                response = response,
+                onSuccess = {
+                    if (it.data?.token != null && it.data?.id != null) {
+                        storeUserTokenAndId("Bearer ${it.data?.token}", it.data?.id!!)
                     }
                     _isGenerateAccessTokenSuccess.call()
-                }
-                is ApiResponse.Failure.Error -> {
-                    when (response.statusCode) {
+                },
+                onError = {
+                    when (it.statusCode) {
                         StatusCode.BadRequest -> {
                             // 올바르지 않은 닉네임
                         }
@@ -177,11 +133,10 @@ class AuthViewModel(
                             _errorMessageId.value = Event(R.string.error_message_other)
                         }
                     }
-                }
-                is ApiResponse.Failure.Exception -> {
+                }, onException = {
                     _errorMessageId.value = Event(R.string.error_message_other)
                 }
-            }
+            )
         }
     }
 

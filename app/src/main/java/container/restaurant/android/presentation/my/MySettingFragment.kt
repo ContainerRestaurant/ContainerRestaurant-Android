@@ -57,7 +57,7 @@ class MySettingFragment : Fragment() {
                 //Todo 로그아웃 동작
                 MainActivity.BottomNavItem.HOME.navigate.invoke(navigationController)
                 if(activity is MainActivity) {
-                    (activity as MainActivity).binding?.bottomNav?.selectedItemId = MainActivity.BottomNavItem.HOME.menuId
+                    (activity as MainActivity).viewDataBinding.bottomNav.selectedItemId = MainActivity.BottomNavItem.HOME.menuId
                 }
                 viewModel.logOut()
                 dialogSelf.dismiss()

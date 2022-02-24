@@ -10,6 +10,7 @@ import container.restaurant.android.data.PrefStorage
 import container.restaurant.android.data.repository.AuthRepository
 import container.restaurant.android.data.repository.MyRepository
 import container.restaurant.android.data.response.FeedListResponse
+import container.restaurant.android.presentation.base.BaseViewModel
 import container.restaurant.android.util.Event
 import container.restaurant.android.util.handleApiResponse
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +18,7 @@ import kotlinx.coroutines.flow.collect
 import timber.log.Timber
 
 class MyViewModel(private val prefStorage: PrefStorage, private val myRepository: MyRepository) :
-    ViewModel() {
+    BaseViewModel() {
     val getErrorMsg = MutableLiveData<String>()
     val viewLoading = MutableLiveData<Boolean>()
 

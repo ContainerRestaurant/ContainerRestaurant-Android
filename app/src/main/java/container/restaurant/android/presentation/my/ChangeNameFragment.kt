@@ -18,19 +18,16 @@ import container.restaurant.android.dialog.AlertDialog
 import container.restaurant.android.presentation.auth.AuthViewModel
 import container.restaurant.android.presentation.base.BaseFragment
 import container.restaurant.android.presentation.user.UserProfileActivity
-import container.restaurant.android.util.EventObserver
-import container.restaurant.android.util.observe
+import container.restaurant.android.util.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
-class ChangeNameFragment : BaseFragment() {
-
-    private lateinit var binding: FragmentChangeNameBinding
-
-    private val viewModel: AuthViewModel by sharedViewModel()
+class ChangeNameFragment : BaseFragment<FragmentChangeNameBinding, AuthViewModel>() {
+    override val layoutResId: Int = R.layout.fragment_change_name
+    override val viewModel: AuthViewModel by sharedViewModel()
 
     private val nicknameEditing = MutableStateFlow("")
 
@@ -42,19 +39,9 @@ class ChangeNameFragment : BaseFragment() {
         private const val DEBOUNCE_TIME = 250L
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        binding = FragmentChangeNameBinding.inflate(inflater, container, false)
-            .apply {
-                this.viewModel = this@ChangeNameFragment.viewModel
-                this.lifecycleOwner = this@ChangeNameFragment
-            }
-
-        return binding.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        viewDataBinding.viewModel = viewModel
         observeData()
         setupNicknameEditing()
     }
@@ -89,19 +76,19 @@ class ChangeNameFragment : BaseFragment() {
     //버튼 활성화 설정
     private fun setBtnCompleteValidation(isValidate: Boolean) {
         if(isValidate) {
-            binding.tvNicknameError.setTextColor(ContextCompat.getColor(requireContext(), R.color.green_03))
+            viewDataBinding.tvNicknameError.setTextColor(ContextCompat.getColor(requireContext(), R.color.green_03))
         }
         else {
-            binding.tvNicknameError.setTextColor(ContextCompat.getColor(requireContext(), R.color.orange_02))
+            viewDataBinding.tvNicknameError.setTextColor(ContextCompat.getColor(requireContext(), R.color.orange_02))
         }
-        binding.btnComplete.isActivated = isValidate
+        viewDataBinding.btnComplete.isActivated = isValidate
     }
 
     //nickname 입력 리스너 설정
     private fun setupNicknameEditing() {
-        binding.editNickname.setText(args.nickName)
+        viewDataBinding.editNickname.setText(args.nickName)
         viewModel.infoMessage.value=""
-        binding.editNickname.doOnTextChanged { text, _, _, _ ->
+        viewDataBinding.editNickname.doOnTextChanged { text, _, _, _ ->
             nicknameEditing.value = text.toString()
             // 사용자가 처음 수정 이후에 안내 메세지를 보여주도록 함
             if(nicknameFirstEdited) {
@@ -127,17 +114,17 @@ class ChangeNameFragment : BaseFragment() {
                         setBtnCompleteValidation(false)
                         return@filter false
                     }
-                    else if(!viewModel.letterValidationCheck(nickname)){
+                    else if(!letterValidationCheck(nickname)){
                         viewModel.infoMessage.value = getString(R.string.nickname_letter_impossible)
                         setBtnCompleteValidation(false)
                         return@filter false
                     }
-                    else if(!viewModel.lengthShortValidationCheck(nickname)){
+                    else if(!lengthShortValidationCheck(nickname)){
                         viewModel.infoMessage.value = getString(R.string.nickname_too_short)
                         setBtnCompleteValidation(false)
                         return@filter false
                     }
-                    else if(!viewModel.lengthLongValidationCheck(nickname)){
+                    else if(!lengthLongValidationCheck(nickname)){
                         viewModel.infoMessage.value = getString(R.string.nickname_too_long)
                         setBtnCompleteValidation(false)
                         return@filter false
@@ -149,8 +136,6 @@ class ChangeNameFragment : BaseFragment() {
                 }
         }
     }
-
-
 
     private fun completeProfile(profileResponse: UpdateProfileResponse) {
         simpleDialog("Success", "닉네임이 변경되었습니다.", AlertDialog.SUCCESS_TYPE)

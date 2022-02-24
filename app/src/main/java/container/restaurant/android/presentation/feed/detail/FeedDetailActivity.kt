@@ -20,24 +20,17 @@ import container.restaurant.android.util.EventObserver
 import container.restaurant.android.util.observe
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class FeedDetailActivity : BaseActivity() {
-    private lateinit var binding: ActivityFeedDetailBinding
+class FeedDetailActivity : BaseActivity<ActivityFeedDetailBinding, FeedDetailViewModel>() {
 
-    private val viewModel: FeedDetailViewModel by viewModel()
+    override val layoutResId: Int = R.layout.activity_feed_detail
+    override val viewModel: FeedDetailViewModel by viewModel()
 
     private var feedAdapter: FragmentStateAdapter? = null
     private val tabText: MutableList<String> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView<ActivityFeedDetailBinding>(
-            this,
-            R.layout.activity_feed_detail
-        )
-            .apply {
-                viewModel = this@FeedDetailActivity.viewModel
-                lifecycleOwner = this@FeedDetailActivity
-            }
+        viewDataBinding.viewModel = viewModel
 
         val feedId = intent.getIntExtra(DataTransfer.FEED_ID, -1)
         lifecycleScope.launchWhenCreated {
@@ -98,12 +91,12 @@ class FeedDetailActivity : BaseActivity() {
     }
 
     private fun setupFeedPager() {
-        binding.viewPager.adapter = feedAdapter
+        viewDataBinding.viewPager.adapter = feedAdapter
 
-//        binding.viewPager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback(){
+//        viewDataBinding.viewPager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback(){
 //            override fun onPageSelected(position: Int) {
 //                super.onPageSelected(position)
-//                val view = binding.viewPager
+//                val view = viewDataBinding.viewPager
 //                view.post {
 //                    val wMeasureSpec = View.MeasureSpec.makeMeasureSpec(view.width, View.MeasureSpec.EXACTLY)
 //                    val hMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
@@ -120,7 +113,7 @@ class FeedDetailActivity : BaseActivity() {
 //        })
 
         // tabLayout 과 viewPager 를 연결
-        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, pos ->
+        TabLayoutMediator(viewDataBinding.tabLayout, viewDataBinding.viewPager) { tab, pos ->
             tab.text = tabText[pos]
         }.attach()
 

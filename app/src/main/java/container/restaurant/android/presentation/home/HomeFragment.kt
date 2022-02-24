@@ -191,12 +191,6 @@ internal class HomeFragment : Fragment() {
                 onClose = { parentFragment?.parentFragmentManager?.popBackStack() }
             )
             kakaoSignInDialogFragment.show(childFragmentManager, kakaoSignInDialogFragment.tag)
-
-            observeAuthViewModelUserInfo(
-                viewLifecycleOwner,
-                kakaoSignInDialogFragment.viewModel,
-                onSignInSuccess
-            )
         }
 
         // 프로젝트에 저장된 토큰 있을 때
@@ -205,7 +199,6 @@ internal class HomeFragment : Fragment() {
                 ifAlreadySignIn(authViewModel, requireActivity())
             }
         }
-        observeAuthViewModelUserInfo(viewLifecycleOwner, authViewModel, onSignInSuccess)
     }
 
     companion object {

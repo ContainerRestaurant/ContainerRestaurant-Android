@@ -4,13 +4,14 @@ import androidx.lifecycle.*
 import container.restaurant.android.data.*
 import container.restaurant.android.data.repository.FeedWriteRepository
 import container.restaurant.android.data.response.SearchLocationResponse
+import container.restaurant.android.presentation.base.BaseViewModel
 import container.restaurant.android.util.Event
 import container.restaurant.android.util.RecyclerViewItemClickListeners
 import container.restaurant.android.util.handleApiResponse
 import kotlinx.coroutines.flow.collect
 import timber.log.Timber
 
-internal class FeedWriteViewModel(private val feedWriteRepository: FeedWriteRepository) : ViewModel(),
+internal class FeedWriteViewModel(private val feedWriteRepository: FeedWriteRepository) : BaseViewModel(),
     RecyclerViewItemClickListeners.CategorySelectionItemClickListener,
     RecyclerViewItemClickListeners.FoodPhotoItemClickListener,
     RecyclerViewItemClickListeners.SearchResultItemClickListener{

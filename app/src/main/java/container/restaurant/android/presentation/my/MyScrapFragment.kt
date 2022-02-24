@@ -7,29 +7,25 @@ import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import container.restaurant.android.R
 import container.restaurant.android.databinding.FragmentMyScrapBinding
 import container.restaurant.android.presentation.base.BaseFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class MyScrapFragment : BaseFragment() {
+class MyScrapFragment : BaseFragment<FragmentMyScrapBinding, MyViewModel>() {
 
     private lateinit var binding: FragmentMyScrapBinding
 
-    private val viewModel: MyViewModel by viewModel()
+    override val layoutResId: Int = R.layout.fragment_my_scrap
+    override val viewModel: MyViewModel by viewModel()
 
     private val args: MyScrapFragmentArgs by navArgs()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        binding = FragmentMyScrapBinding.inflate(inflater, container, false).apply {
-            this.viewModel = this@MyScrapFragment.viewModel
-            this.lifecycleOwner = this@MyScrapFragment
-        }
-        context ?: return binding.root
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewDataBinding.viewModel = viewModel
         setBindItem()
         getMyScrapFeedList()
-
-        return binding.root
     }
 
     private fun setBindItem() {

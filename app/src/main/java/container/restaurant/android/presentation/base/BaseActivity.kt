@@ -6,17 +6,45 @@ import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
+import container.restaurant.android.R
 import container.restaurant.android.dialog.ProgressDialog
 import container.restaurant.android.dialog.AlertDialog
+import container.restaurant.android.util.EventObserver
 
-abstract class BaseActivity : AppCompatActivity() {
+abstract class BaseActivity<T: ViewDataBinding, VM: BaseViewModel> : AppCompatActivity() {
 
     private lateinit var simpleDialog: AlertDialog
     private lateinit var loadingDialog: ProgressDialog
 
+    lateinit var viewDataBinding: T
+
+    abstract val layoutResId : Int
+    abstract val viewModel : VM
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         loadingDialog = ProgressDialog(this)
+
+        viewDataBinding = DataBindingUtil.setContentView(this, layoutResId)
+        viewDataBinding.lifecycleOwner = this@BaseActivity
+
+        observeData()
+    }
+
+    private fun observeData() {
+        viewModel.toastMessage.observe(this, EventObserver {
+            toastShort(it)
+        })
+    }
+
+    fun toastShort(toastMessage: String) {
+        Toast.makeText(this, toastMessage, Toast.LENGTH_SHORT).show()
+    }
+
+    fun toastShortOfFailMessage(themeKeyword: String) {
+        toastShort(String.format(getString(R.string.failed_message), themeKeyword))
     }
 
     fun loadingCheck(isLoading:Boolean) {

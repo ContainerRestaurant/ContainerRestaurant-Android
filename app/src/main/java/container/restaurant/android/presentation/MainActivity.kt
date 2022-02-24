@@ -1,9 +1,6 @@
 package container.restaurant.android.presentation
 
-import android.content.Intent
 import android.os.Bundle
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IdRes
 import androidx.annotation.MenuRes
 import androidx.databinding.DataBindingUtil
@@ -25,33 +22,18 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import timber.log.Timber
 
-internal class MainActivity : BaseActivity() {
+internal class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
 
     private val navigationController: NavigationController by inject { parametersOf(this) }
 
-    private val viewModel: MainViewModel by viewModel()
+    override val layoutResId: Int = R.layout.activity_main
+    override val viewModel: MainViewModel by viewModel()
     private val authViewModel: AuthViewModel by viewModel()
-
-    internal val binding by lazy {
-        DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
-            .apply {
-                lifecycleOwner = this@MainActivity
-                viewModel = this@MainActivity.viewModel
-            }
-    }
-
-    // 가입 완료후 업데이트 할 정보
-    private fun updateData() {
-        startActivity(FeedWriteActivity.getIntent(this@MainActivity))
-    }
-    private val signUpResultLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) {
-        updateData()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewDataBinding.viewModel = viewModel
+
         with(viewModel) {
             isFeedWriteClicked.observe(this@MainActivity) {
                 logInAndFeedWrite()
@@ -64,13 +46,13 @@ internal class MainActivity : BaseActivity() {
             if(supportFragmentManager.findFragmentByTag(NavHostFragment::class.java.simpleName)==null){
                 when {
                     supportFragmentManager.findFragmentByTag(HomeFragment::class.java.simpleName)!=null -> {
-                        binding.bottomNav.selectedItemId = BottomNavItem.HOME.menuId
+                        viewDataBinding.bottomNav.selectedItemId = BottomNavItem.HOME.menuId
                     }
                     supportFragmentManager.findFragmentByTag(FeedExploreFragment::class.java.simpleName)!=null -> {
-                        binding.bottomNav.selectedItemId = BottomNavItem.FEED.menuId
+                        viewDataBinding.bottomNav.selectedItemId = BottomNavItem.FEED.menuId
                     }
                     supportFragmentManager.findFragmentByTag(MapsFragment::class.java.simpleName)!=null -> {
-                        binding.bottomNav.selectedItemId = BottomNavItem.MAP.menuId
+                        viewDataBinding.bottomNav.selectedItemId = BottomNavItem.MAP.menuId
                     }
                 }
             }
@@ -81,7 +63,6 @@ internal class MainActivity : BaseActivity() {
     private fun logInAndFeedWrite() {
         // 로그인 성공 했을 때 동작
         val onSignInSuccess: (UserInfoResponse) -> Unit = {
-            Timber.d("signInSuccess")
             startActivity(FeedWriteActivity.getIntent(this@MainActivity))
         }
 
@@ -93,12 +74,6 @@ internal class MainActivity : BaseActivity() {
                 onClose = {}
             )
             kakaoSignInDialogFragment.show(supportFragmentManager, kakaoSignInDialogFragment.tag)
-
-            observeAuthViewModelUserInfo(
-                this@MainActivity,
-                kakaoSignInDialogFragment.viewModel,
-                onSignInSuccess
-            )
         }
 
         // 프로젝트에 저장된 토큰 있을 때
@@ -112,8 +87,8 @@ internal class MainActivity : BaseActivity() {
 
 
     private fun setupBottomNav(savedInstanceState: Bundle?) {
-        binding.bottomNav.itemIconTintList = null
-        binding.bottomNav.setOnNavigationItemSelectedListener { menuItem ->
+        viewDataBinding.bottomNav.itemIconTintList = null
+        viewDataBinding.bottomNav.setOnNavigationItemSelectedListener { menuItem ->
             val navItem = BottomNavItem.values().find { bottomNavItem ->
                 menuItem.itemId == bottomNavItem.menuId }
             navItem?.navigate?.invoke(navigationController)
@@ -121,7 +96,7 @@ internal class MainActivity : BaseActivity() {
         }
         if (savedInstanceState == null) {
             BottomNavItem.HOME.navigate.invoke(navigationController)
-            binding.bottomNav.selectedItemId = R.id.home
+            viewDataBinding.bottomNav.selectedItemId = R.id.home
         }
     }
 

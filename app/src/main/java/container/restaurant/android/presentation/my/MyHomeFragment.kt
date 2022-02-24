@@ -10,6 +10,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import container.restaurant.android.R
 import container.restaurant.android.data.response.UserInfoResponse
 import container.restaurant.android.databinding.FragmentMyHomeBinding
 import container.restaurant.android.presentation.auth.AuthViewModel
@@ -19,28 +20,16 @@ import container.restaurant.android.util.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-class MyHomeFragment : BaseFragment() {
+class MyHomeFragment : BaseFragment<FragmentMyHomeBinding, MyViewModel>() {
 
     private lateinit var binding: FragmentMyHomeBinding
-
-    private val viewModel: MyViewModel by viewModel()
+    override val layoutResId: Int = R.layout.fragment_my_home
+    override val viewModel: MyViewModel by viewModel()
     private val authViewModel: AuthViewModel by viewModel()
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentMyHomeBinding.inflate(inflater, container, false)
-            .apply {
-                this.viewModel = this@MyHomeFragment.viewModel
-                this.lifecycleOwner = this@MyHomeFragment
-            }
-        return binding.root
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewDataBinding.viewModel = viewModel
         observeData()
         logInCheck()
     }
@@ -86,8 +75,6 @@ class MyHomeFragment : BaseFragment() {
                 onClose = { parentFragment?.parentFragmentManager?.popBackStack() }
             )
             kakaoSignInDialogFragment.show(childFragmentManager, kakaoSignInDialogFragment.tag)
-
-            observeAuthViewModelUserInfo(viewLifecycleOwner, kakaoSignInDialogFragment.viewModel, onSignInSuccess)
         }
 
         // 프로젝트에 저장된 토큰 있을 때
@@ -96,8 +83,6 @@ class MyHomeFragment : BaseFragment() {
                 ifAlreadySignIn(authViewModel, requireActivity())
             }
         }
-
-        observeAuthViewModelUserInfo(viewLifecycleOwner, authViewModel, onSignInSuccess)
     }
 
     private fun observeData() {

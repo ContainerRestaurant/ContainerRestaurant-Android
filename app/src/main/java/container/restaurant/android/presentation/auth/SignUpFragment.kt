@@ -13,9 +13,7 @@ import container.restaurant.android.R
 import container.restaurant.android.data.request.UpdateProfileRequest
 import container.restaurant.android.databinding.FragmentSignUpBinding
 import container.restaurant.android.presentation.user.UserProfileActivity
-import container.restaurant.android.util.DataTransfer
-import container.restaurant.android.util.EventObserver
-import container.restaurant.android.util.observe
+import container.restaurant.android.util.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.debounce
@@ -82,14 +80,6 @@ internal class SignUpFragment : Fragment() {
                 }
             }
         })
-
-        // 회원 가입이 완료되면 입력된 닉네임을 등록하고 액티비티 종료
-        viewModel.isGenerateAccessTokenSuccess.observe(viewLifecycleOwner) {
-            lifecycleScope.launchWhenCreated {
-                viewModel.updateProfile(UpdateProfileRequest(nicknameEditing.value))
-                requireActivity().finish()
-            }
-        }
     }
 
     //버튼 활성화 설정
@@ -126,17 +116,17 @@ internal class SignUpFragment : Fragment() {
                         setBtnCompleteValidation(false)
                         return@filter false
                     }
-                    else if(!viewModel.letterValidationCheck(nickname)){
+                    else if(!letterValidationCheck(nickname)){
                         viewModel.infoMessage.value = getString(R.string.nickname_letter_impossible)
                         setBtnCompleteValidation(false)
                         return@filter false
                     }
-                    else if(!viewModel.lengthShortValidationCheck(nickname)){
+                    else if(!lengthShortValidationCheck(nickname)){
                         viewModel.infoMessage.value = getString(R.string.nickname_too_short)
                         setBtnCompleteValidation(false)
                         return@filter false
                     }
-                    else if(!viewModel.lengthLongValidationCheck(nickname)){
+                    else if(!lengthLongValidationCheck(nickname)){
                         viewModel.infoMessage.value = getString(R.string.nickname_too_long)
                         setBtnCompleteValidation(false)
                         return@filter false

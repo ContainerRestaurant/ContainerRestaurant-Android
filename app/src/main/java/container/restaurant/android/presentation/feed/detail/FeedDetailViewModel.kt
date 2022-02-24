@@ -7,13 +7,14 @@ import androidx.viewpager2.widget.ViewPager2
 import container.restaurant.android.data.FeedCategory
 import container.restaurant.android.data.repository.FeedDetailRepository
 import container.restaurant.android.data.response.FeedDetailResponse
+import container.restaurant.android.presentation.base.BaseViewModel
 import container.restaurant.android.util.Event
 import container.restaurant.android.util.handleApiResponse
 import kotlinx.coroutines.flow.collect
 import okhttp3.internal.notifyAll
 import timber.log.Timber
 
-internal class FeedDetailViewModel(private val feedDetailRepository: FeedDetailRepository): ViewModel() {
+class FeedDetailViewModel(private val feedDetailRepository: FeedDetailRepository): BaseViewModel() {
 
     private val _ownerNickname: MutableLiveData<String> = MutableLiveData()
     val ownerNickname: LiveData<String> = _ownerNickname

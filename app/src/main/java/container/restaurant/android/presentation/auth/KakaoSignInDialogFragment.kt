@@ -1,5 +1,6 @@
 package container.restaurant.android.presentation.auth
 
+import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -24,11 +25,21 @@ import timber.log.Timber
 class KakaoSignInDialogFragment(val onSignInSuccess:(UserInfoResponse)->Unit,val onClose:() -> Unit) : DialogFragment() {
 
     private lateinit var binding: FragmentKakaoSigninBinding
-    val viewModel: AuthViewModel by viewModel()
+    val viewModel: KakaoSignInDialogViewModel by viewModel()
 
     private lateinit var provider: String
     private lateinit var kakaoAccessToken: String
 
+    private val signUpResultLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        // 가입 성공했을 때 처리
+        if(it.resultCode == Activity.RESULT_OK) {
+            viewModel.userInfoResponse.value?.let { userInfoResponse ->
+                onSignInSuccess(userInfoResponse)
+            }
+        }
+    }
 
     private val kakaoUserApi by lazy {
         UserApiClient.instance
@@ -50,11 +61,39 @@ class KakaoSignInDialogFragment(val onSignInSuccess:(UserInfoResponse)->Unit,val
                     lifecycleScope.launchWhenCreated {
                         viewModel.generateAccessToken(
                             Provider.KAKAO.providerStr,
-                            token.accessToken
+                            token.accessToken,
+                            {
+                                signInWithAccessToken()
+                            },
+                            onGenerateFail = {
+                                Toast.makeText(requireContext(), "회원가입에 실패하였습니다.", Toast.LENGTH_SHORT).show()
+                            }
                         )
                     }
                 }
             }
+        }
+    }
+
+    private fun signInWithAccessToken() {
+        requireActivity().lifecycleScope.launchWhenCreated {
+            val tokenBearer = viewModel.tokenBearer.value ?: ""
+            viewModel.signInWithAccessToken(
+                tokenBearer,
+                onNicknameNull = {
+                    signUpResultLauncher.launch(
+                        Intent(
+                            requireActivity(),
+                            SignUpActivity::class.java
+                        )
+                    )
+                    dismiss()
+                },
+                onSignInSuccess = {
+                    onSignInSuccess(it)
+                    dismiss()
+                }
+            )
         }
     }
 
@@ -87,29 +126,6 @@ class KakaoSignInDialogFragment(val onSignInSuccess:(UserInfoResponse)->Unit,val
                 Toast.makeText(requireContext(), getString(it), Toast.LENGTH_LONG).show()
                 this@KakaoSignInDialogFragment.dismiss()
             })
-            isGenerateAccessTokenSuccess.observe(viewLifecycleOwner) {
-                val signUpResultLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
-                    ActivityResultContracts.StartActivityForResult()
-                ) {
-                }
-                requireActivity().lifecycleScope.launchWhenCreated {
-                    signInWithAccessToken(
-                        onNicknameNull = {
-                            signUpResultLauncher.launch(
-                                Intent(
-                                    requireActivity(),
-                                    SignUpActivity::class.java
-                                )
-                            )
-                            dismiss()
-                        },
-                        onSignInSuccess = {
-                            onSignInSuccess(it)
-                            dismiss()
-                        }
-                    )
-                }
-            }
         }
     }
 

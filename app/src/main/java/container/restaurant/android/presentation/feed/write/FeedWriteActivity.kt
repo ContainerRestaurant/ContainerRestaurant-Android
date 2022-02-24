@@ -28,10 +28,10 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import java.io.InputStream
 
-class FeedWriteActivity : BaseActivity(), View.OnClickListener {
+internal class FeedWriteActivity : BaseActivity<ActivityFeedWriteBinding, FeedWriteViewModel>(), View.OnClickListener {
 
-    private lateinit var binding: ActivityFeedWriteBinding
-    private val viewModel: FeedWriteViewModel by viewModel()
+    override val layoutResId: Int = R.layout.activity_feed_write
+    override val viewModel: FeedWriteViewModel by viewModel()
     private val bottomSheetFragment = FeedWriteBottomSheetFragment()
 
     private var restaurantCreateDto: FeedWriteRequest.RestaurantCreateDto? = null
@@ -62,9 +62,7 @@ class FeedWriteActivity : BaseActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_feed_write)
-        binding.viewModel = this.viewModel
-        binding.lifecycleOwner = this
+        viewDataBinding.viewModel = viewModel
 
         observeData()
         setBindItem()
@@ -80,7 +78,7 @@ class FeedWriteActivity : BaseActivity(), View.OnClickListener {
             flexDirection = FlexDirection.ROW
             justifyContent = JustifyContent.FLEX_START
         }.let {
-            binding.rvCategory.layoutManager = it
+            viewDataBinding.rvCategory.layoutManager = it
         }
     }
 
@@ -94,13 +92,13 @@ class FeedWriteActivity : BaseActivity(), View.OnClickListener {
             isWelcomedButtonClicked.observe(this@FeedWriteActivity , EventObserver {
                 Timber.d("onWelcomeButtonClick $it")
                 if(it) {
-                    binding.badgeFilled.visibility = View.VISIBLE
-                    binding.ivBadgeUnfilled.visibility = View.INVISIBLE
-                    binding.badgeFilled.playAnimation()
+                    viewDataBinding.badgeFilled.visibility = View.VISIBLE
+                    viewDataBinding.ivBadgeUnfilled.visibility = View.INVISIBLE
+                    viewDataBinding.badgeFilled.playAnimation()
                 }
                 else {
-                    binding.badgeFilled.visibility = View.INVISIBLE
-                    binding.ivBadgeUnfilled.visibility = View.VISIBLE
+                    viewDataBinding.badgeFilled.visibility = View.INVISIBLE
+                    viewDataBinding.ivBadgeUnfilled.visibility = View.VISIBLE
                 }
             })
             isSearchEditTextClicked.observe(this@FeedWriteActivity, EventObserver {
@@ -152,7 +150,7 @@ class FeedWriteActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun setBindItem() {
-        binding.apply {
+        viewDataBinding.apply {
             btnFeedUpdate.setOnClickListener(this@FeedWriteActivity)
         }
     }
@@ -175,10 +173,10 @@ class FeedWriteActivity : BaseActivity(), View.OnClickListener {
             if(feedNullCheck()) {
                 val restaurantCreateDto = restaurantCreateDto
                 val category = categoryStr
-                val difficulty = binding.sbDifficulty.childCount
+                val difficulty = viewDataBinding.sbDifficulty.childCount
                 val welcome = welcome
                 val thumbnailImageId = imageUploadId ?: 9
-                val content = binding.etContent.text.toString()
+                val content = viewDataBinding.etContent.text.toString()
                 val mainMenuList: MutableList<FeedWriteRequest.MainMenu> = mutableListOf()
 //                mainFoodAdapter.currentList.forEach {
 //                    mainMenuList.add(FeedWriteRequest.MainMenu(it.foodName, it.bottle))
@@ -248,15 +246,15 @@ class FeedWriteActivity : BaseActivity(), View.OnClickListener {
 
 
     private fun difficultyAction() {
-        binding.sbDifficulty.setOnRatingChangeListener { RatingCount ->
-            binding.tvDifficultyInfo.visibility = View.VISIBLE
+        viewDataBinding.sbDifficulty.setOnRatingChangeListener { RatingCount ->
+            viewDataBinding.tvDifficultyInfo.visibility = View.VISIBLE
             when (RatingCount.toInt()) {
-                0 -> binding.tvDifficultyInfo.visibility = View.INVISIBLE
-                1 -> binding.tvDifficultyInfo.text = "쉬워요"
-                2 -> binding.tvDifficultyInfo.text = "할 만 해요"
-                3 -> binding.tvDifficultyInfo.text = "보통이에요"
-                4 -> binding.tvDifficultyInfo.text = "까다로워요"
-                5 -> binding.tvDifficultyInfo.text = "많이 어려워요"
+                0 -> viewDataBinding.tvDifficultyInfo.visibility = View.INVISIBLE
+                1 -> viewDataBinding.tvDifficultyInfo.text = "쉬워요"
+                2 -> viewDataBinding.tvDifficultyInfo.text = "할 만 해요"
+                3 -> viewDataBinding.tvDifficultyInfo.text = "보통이에요"
+                4 -> viewDataBinding.tvDifficultyInfo.text = "까다로워요"
+                5 -> viewDataBinding.tvDifficultyInfo.text = "많이 어려워요"
             }
         }
     }
