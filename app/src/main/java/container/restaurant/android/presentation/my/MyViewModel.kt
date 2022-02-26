@@ -10,6 +10,7 @@ import container.restaurant.android.data.PrefStorage
 import container.restaurant.android.data.repository.AuthRepository
 import container.restaurant.android.data.repository.MyRepository
 import container.restaurant.android.data.response.FeedListResponse
+import container.restaurant.android.data.response.UserInfoResponse
 import container.restaurant.android.presentation.base.BaseViewModel
 import container.restaurant.android.util.Event
 import container.restaurant.android.util.handleApiResponse
@@ -17,7 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import timber.log.Timber
 
-class MyViewModel(private val prefStorage: PrefStorage, private val myRepository: MyRepository) :
+class MyViewModel(private val prefStorage: PrefStorage, private val authRepository: AuthRepository,private val myRepository: MyRepository) :
     BaseViewModel() {
     val getErrorMsg = MutableLiveData<String>()
     val viewLoading = MutableLiveData<Boolean>()
@@ -91,6 +92,32 @@ class MyViewModel(private val prefStorage: PrefStorage, private val myRepository
         prefStorage.isUserSignIn = false
         prefStorage.userId = 0
         prefStorage.tokenBearer = ""
+    }
+
+    suspend fun signInWithAccessToken(
+        onNicknameNull: () -> Unit = {},
+        onSignInSuccess: (UserInfoResponse) -> Unit = {},
+        onInvalidToken: () -> Unit = {}
+    ) {
+        authRepository.signInWithAccessToken(prefStorage.tokenBearer)
+            .collect { response ->
+                handleApiResponse(response = response,
+                    onSuccess = {
+                        if (it.data?.nickname == null) {
+                            onNicknameNull()
+                        } else {
+                            it.data?.let { userInfoResponse ->
+                                onSignInSuccess(userInfoResponse)
+                            }
+                        }
+                    },
+                    onError = {
+                        if (it.statusCode == StatusCode.Unauthorized) {
+                            onInvalidToken()
+                        }
+                    }
+                )
+            }
     }
 
     suspend fun getMyInfo(onInvalidToken:()->Unit = {}) {

@@ -25,7 +25,7 @@ val presentationModule = module {
     viewModel { FeedCategoryViewModel(get(), it[0]) }
     viewModel { FeedAllViewModel(get()) }
     viewModel { FeedWriteViewModel(get()) }
-    viewModel { MyViewModel(get(), get()) }
+    viewModel { MyViewModel(get(), get(), get()) }
     viewModel { MapsViewModel(get()) }
     viewModel { FeedRestaurantViewModel(get()) }
     viewModel { AuthViewModel(get(), get()) }
