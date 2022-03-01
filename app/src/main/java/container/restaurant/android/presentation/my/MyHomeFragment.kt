@@ -48,10 +48,8 @@ class MyHomeFragment : BaseFragment<FragmentMyHomeBinding, MyViewModel>() {
             updateData(it)
         }
 
-        val sharedPrefStorage = SharedPrefStorage(requireContext())
-
         // 프로젝트에 저장된 토큰 없을 때
-        if (!sharedPrefStorage.isUserSignIn) {
+        if (!SharedPrefStorage(requireContext()).isUserSignIn) {
             val kakaoSignInDialogFragment = KakaoSignInDialogFragment(
                 onSignInSuccess = onSignInSuccess,
                 onClose = { parentFragment?.parentFragmentManager?.popBackStack() }

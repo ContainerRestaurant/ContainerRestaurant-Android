@@ -11,10 +11,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.tabs.TabLayoutMediator
+import container.restaurant.android.data.SharedPrefStorage
 import container.restaurant.android.data.response.UserInfoResponse
 import container.restaurant.android.databinding.FragmentHomeBinding
 import container.restaurant.android.dialog.SimpleConfirmDialog
-import container.restaurant.android.presentation.auth.AuthViewModel
 import container.restaurant.android.presentation.auth.KakaoSignInDialogFragment
 import container.restaurant.android.presentation.feed.all.FeedAllActivity
 import container.restaurant.android.presentation.feed.write.FeedWriteActivity
@@ -30,7 +30,6 @@ internal class HomeFragment : Fragment() {
     }
 
     private val viewModel: HomeViewModel by viewModel()
-    private val authViewModel: AuthViewModel by viewModel()
 
     private lateinit var binding: FragmentHomeBinding
 
@@ -185,7 +184,7 @@ internal class HomeFragment : Fragment() {
 
 
         // 프로젝트에 저장된 토큰 없을 때
-        if (!authViewModel.isUserSignIn()) {
+        if (!SharedPrefStorage(requireContext()).isUserSignIn) {
             val kakaoSignInDialogFragment = KakaoSignInDialogFragment(
                 onSignInSuccess = onSignInSuccess,
                 onClose = { parentFragment?.parentFragmentManager?.popBackStack() }
@@ -196,7 +195,11 @@ internal class HomeFragment : Fragment() {
         // 프로젝트에 저장된 토큰 있을 때
         else {
             lifecycleScope.launchWhenCreated {
-                ifAlreadySignIn(authViewModel, requireActivity())
+                viewModel.signInWithAccessToken(
+                    onNicknameNull = {},
+                    onSignInSuccess = onSignInSuccess,
+                    onInvalidToken = {}
+                )
             }
         }
     }

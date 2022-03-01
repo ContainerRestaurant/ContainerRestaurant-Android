@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import timber.log.Timber
 
-class MyViewModel(private val prefStorage: PrefStorage, private val authRepository: AuthRepository,private val myRepository: MyRepository) :
+class MyViewModel(private val prefStorage: PrefStorage, private val authRepository: AuthRepository, private val myRepository: MyRepository) :
     BaseViewModel() {
     val getErrorMsg = MutableLiveData<String>()
     val viewLoading = MutableLiveData<Boolean>()

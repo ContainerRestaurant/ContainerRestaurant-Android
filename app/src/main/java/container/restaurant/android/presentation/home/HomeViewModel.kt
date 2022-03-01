@@ -3,11 +3,14 @@ package container.restaurant.android.presentation.home
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.skydoves.sandwich.StatusCode
 import container.restaurant.android.data.PrefStorage
+import container.restaurant.android.data.repository.AuthRepository
 import container.restaurant.android.data.repository.HomeRepository
 import container.restaurant.android.data.response.FeedListResponse
 import container.restaurant.android.data.response.HomeInfoResponse
 import container.restaurant.android.data.response.ProfileResponse
+import container.restaurant.android.data.response.UserInfoResponse
 import container.restaurant.android.util.Event
 import container.restaurant.android.util.handleApiResponse
 import kotlinx.coroutines.flow.collect
@@ -15,6 +18,7 @@ import timber.log.Timber
 
 internal class HomeViewModel(
     private val prefStorage: PrefStorage,
+    private val authRepository: AuthRepository,
     private val homeRepository: HomeRepository
 ) : ViewModel() {
 
@@ -134,6 +138,32 @@ internal class HomeViewModel(
                     onException = {
                         Timber.d("it.message : ${it.message}")
                         Timber.d("it.exception : ${it.exception}")
+                    }
+                )
+            }
+    }
+
+    suspend fun signInWithAccessToken(
+        onNicknameNull: () -> Unit = {},
+        onSignInSuccess: (UserInfoResponse) -> Unit = {},
+        onInvalidToken: () -> Unit = {}
+    ) {
+        authRepository.signInWithAccessToken(prefStorage.tokenBearer)
+            .collect { response ->
+                handleApiResponse(response = response,
+                    onSuccess = {
+                        if (it.data?.nickname == null) {
+                            onNicknameNull()
+                        } else {
+                            it.data?.let { userInfoResponse ->
+                                onSignInSuccess(userInfoResponse)
+                            }
+                        }
+                    },
+                    onError = {
+                        if (it.statusCode == StatusCode.Unauthorized) {
+                            onInvalidToken()
+                        }
                     }
                 )
             }
