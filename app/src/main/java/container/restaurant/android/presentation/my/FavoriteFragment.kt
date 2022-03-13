@@ -13,8 +13,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class FavoriteFragment : BaseFragment<FragmentFavoriteBinding, MyViewModel>() {
 
-    private lateinit var binding: FragmentFavoriteBinding
-
     override val layoutResId: Int = R.layout.fragment_favorite
     override val viewModel: MyViewModel by viewModel()
 
@@ -27,7 +25,7 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding, MyViewModel>() {
     }
 
     private fun setBindItem() {
-        binding.apply {
+        viewDataBinding.apply {
             ivBack.setOnClickListener {
                 findNavController().popBackStack()
             }

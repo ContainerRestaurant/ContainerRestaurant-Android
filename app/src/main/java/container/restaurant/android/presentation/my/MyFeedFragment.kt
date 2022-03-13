@@ -14,8 +14,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MyFeedFragment : BaseFragment<FragmentMyFeedBinding, MyViewModel>() {
 
-    private lateinit var binding: FragmentMyFeedBinding
-
     override val layoutResId: Int = R.layout.fragment_my_feed
     override val viewModel: MyViewModel by viewModel()
 
@@ -29,7 +27,7 @@ class MyFeedFragment : BaseFragment<FragmentMyFeedBinding, MyViewModel>() {
     }
 
     private fun setBindItem() {
-        binding.apply {
+        viewDataBinding.apply {
             ivBack.setOnClickListener {
                 findNavController().popBackStack()
             }

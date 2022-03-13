@@ -29,7 +29,7 @@ class MyScrapFragment : BaseFragment<FragmentMyScrapBinding, MyViewModel>() {
     }
 
     private fun setBindItem() {
-        binding.apply {
+        viewDataBinding.apply {
             ivBack.setOnClickListener {
                 findNavController().popBackStack()
             }
