@@ -22,7 +22,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 
-class KakaoSignInDialogFragment(val onSignInSuccess:(UserInfoResponse)->Unit,val onClose:() -> Unit) : DialogFragment() {
+class KakaoSignInDialogFragment(val onSignInSuccess:(UserInfoResponse)->Unit,val onClose:(() -> Unit)? = null) : DialogFragment() {
 
     private lateinit var binding: FragmentKakaoSigninBinding
     val viewModel: KakaoSignInDialogViewModel by viewModel()
@@ -132,7 +132,7 @@ class KakaoSignInDialogFragment(val onSignInSuccess:(UserInfoResponse)->Unit,val
     //다이얼로그 바깥 쪽 터치 시 호출됨
     override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
-        onClose()
+        onClose?.invoke()
     }
 
     private fun kakaoLogin() {
@@ -150,7 +150,7 @@ class KakaoSignInDialogFragment(val onSignInSuccess:(UserInfoResponse)->Unit,val
 
         //dismiss 는 cancel 과 다른 것 확인함!
         binding.imgClose.setOnClickListener {
-            onClose()
+            onClose?.invoke()
             dismissAllowingStateLoss()
         }
     }

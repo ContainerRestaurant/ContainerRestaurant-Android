@@ -70,8 +70,7 @@ internal class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>()
         if (!authViewModel.isUserSignIn()) {
             Timber.d("user not signIn")
             val kakaoSignInDialogFragment = KakaoSignInDialogFragment(
-                onSignInSuccess = onSignInSuccess,
-                onClose = {}
+                onSignInSuccess = onSignInSuccess
             )
             kakaoSignInDialogFragment.show(supportFragmentManager, kakaoSignInDialogFragment.tag)
         }
