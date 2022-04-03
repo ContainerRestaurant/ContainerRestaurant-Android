@@ -43,6 +43,7 @@ val networkModule = module {
     single { createMyService(get()) }
     single { createLocationService()}
     single { createFeedDetailService(get())}
+    single { createFeedWriteService(get())}
 }
 
 fun createOkHttp(): OkHttpClient {
@@ -74,6 +75,8 @@ fun createAuthService(retrofit: Retrofit): AuthService = retrofit.create(AuthSer
 fun createMyService(retrofit: Retrofit): MyService = retrofit.create(MyService::class.java)
 
 fun createHomeService(retrofit: Retrofit): HomeService = retrofit.create(HomeService::class.java)
+
+fun createFeedWriteService(retrofit: Retrofit): FeedWriteService = retrofit.create(FeedWriteService::class.java)
 
 fun createFeedDetailService(retrofit: Retrofit): FeedDetailService = retrofit.create(FeedDetailService::class.java)
 

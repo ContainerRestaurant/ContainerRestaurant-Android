@@ -3,10 +3,7 @@ package container.restaurant.android.presentation.my
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.skydoves.sandwich.StatusCode
-import container.restaurant.android.data.IntPreference
-import container.restaurant.android.data.PrefStorage
 import container.restaurant.android.data.repository.AuthRepository
 import container.restaurant.android.data.repository.MyRepository
 import container.restaurant.android.data.response.FeedListResponse
@@ -18,7 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import timber.log.Timber
 
-class MyViewModel(private val prefStorage: PrefStorage, private val authRepository: AuthRepository, private val myRepository: MyRepository) :
+class MyViewModel(private val authRepository: AuthRepository, private val myRepository: MyRepository) :
     BaseViewModel() {
     val getErrorMsg = MutableLiveData<String>()
     val viewLoading = MutableLiveData<Boolean>()
@@ -88,18 +85,13 @@ class MyViewModel(private val prefStorage: PrefStorage, private val authReposito
     private fun isPrivacyPolicyLoadDone(): Boolean =
         (privacyPolicyTitle.value != null && privacyPolicyArticle.value != null)
 
-    fun logOut() {
-        prefStorage.isUserSignIn = false
-        prefStorage.userId = 0
-        prefStorage.tokenBearer = ""
-    }
-
     suspend fun signInWithAccessToken(
+        tokenBearer: String,
         onNicknameNull: () -> Unit = {},
         onSignInSuccess: (UserInfoResponse) -> Unit = {},
         onInvalidToken: () -> Unit = {}
     ) {
-        authRepository.signInWithAccessToken(prefStorage.tokenBearer)
+        authRepository.signInWithAccessToken(tokenBearer)
             .collect { response ->
                 handleApiResponse(response = response,
                     onSuccess = {
@@ -120,8 +112,8 @@ class MyViewModel(private val prefStorage: PrefStorage, private val authReposito
             }
     }
 
-    suspend fun getMyInfo(onInvalidToken:()->Unit = {}) {
-        myRepository.getUserInfo(prefStorage.tokenBearer)
+    suspend fun getMyInfo(tokenBearer: String, onInvalidToken:()->Unit = {}) {
+        myRepository.getUserInfo(tokenBearer)
             .collect { response ->
                 handleApiResponse(
                     response = response,

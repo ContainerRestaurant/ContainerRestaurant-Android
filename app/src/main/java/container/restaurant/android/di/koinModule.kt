@@ -20,14 +20,14 @@ import org.koin.dsl.module
 val presentationModule = module {
     single { (activity: AppCompatActivity) -> NavigationController(activity) }
     viewModel { MainViewModel() }
-    viewModel { HomeViewModel(get(), get(), get()) }
+    viewModel { HomeViewModel(get(), get()) }
     viewModel { FeedExploreViewModel() }
     viewModel { FeedCategoryViewModel(get(), it[0]) }
     viewModel { FeedAllViewModel(get()) }
     viewModel { FeedWriteViewModel(get()) }
-    viewModel { MyViewModel(get(), get(), get()) }
+    viewModel { MyViewModel(get(), get()) }
     viewModel { MapsViewModel(get()) }
     viewModel { FeedRestaurantViewModel(get()) }
-    viewModel { AuthViewModel(get(), get()) }
+    viewModel { AuthViewModel(get()) }
     viewModel { FeedDetailViewModel(get()) }
 }

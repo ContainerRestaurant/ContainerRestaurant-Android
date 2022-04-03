@@ -67,7 +67,9 @@ class ChangeNameFragment : BaseFragment<FragmentChangeNameBinding, AuthViewModel
 
         viewModel.isCompleteButtonClicked.observe(viewLifecycleOwner, EventObserver {
             lifecycleScope.launchWhenCreated {
-                viewModel.updateProfile(UpdateProfileRequest(nicknameEditing.value))
+                val tokenBearer = SharedPrefUtil.getString(requireContext()) { TOKEN_BEARER }
+                val userId = SharedPrefUtil.getInt(requireContext()) { USER_ID }
+                viewModel.updateProfile(tokenBearer, userId ,UpdateProfileRequest(nicknameEditing.value))
                 findNavController().popBackStack()
             }
         })

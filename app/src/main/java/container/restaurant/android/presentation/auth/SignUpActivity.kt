@@ -29,8 +29,6 @@ internal class SignUpActivity : BaseActivity<ActivitySignUpBinding, AuthViewMode
             .apply { }
     }
 
-    private lateinit var binding: ActivitySignUpBinding
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewDataBinding.viewModel = viewModel

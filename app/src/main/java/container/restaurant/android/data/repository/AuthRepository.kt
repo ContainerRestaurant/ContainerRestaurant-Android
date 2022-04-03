@@ -1,8 +1,8 @@
 package container.restaurant.android.data.repository
 
+import android.content.Context
 import androidx.annotation.WorkerThread
 import com.skydoves.sandwich.*
-import container.restaurant.android.data.PrefStorage
 import container.restaurant.android.data.remote.AuthService
 import container.restaurant.android.data.request.SignUpWithAccessTokenRequest
 import container.restaurant.android.data.request.UpdateProfileRequest
@@ -11,13 +11,14 @@ import container.restaurant.android.data.response.ProfileResponse
 import container.restaurant.android.data.response.SignUpWithAccessTokenResponse
 import container.restaurant.android.data.response.UserInfoResponse
 import container.restaurant.android.util.ErrorResponseMapper
+import container.restaurant.android.util.SharedPrefUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
 
 
 interface AuthRepository {
-    fun isUserSignIn(): Boolean
+    fun isUserSignIn(context: Context): Boolean
     suspend fun signInWithAccessToken(
         tokenBearer: String
     ): Flow<ApiResponse<UserInfoResponse>>
@@ -39,17 +40,14 @@ interface AuthRepository {
         userId: Int
         , updateProfileRequest: UpdateProfileRequest? = null
     ): Flow<ApiResponse<ProfileResponse>>
-
-    fun storeUserTokenAndId(token: String, userId: Int)
 }
 
 internal class AuthDataRepository(
-    private val prefStorage: PrefStorage,
     private val authService: AuthService
 ) : AuthRepository {
 
-    override fun isUserSignIn(): Boolean {
-        return prefStorage.isUserSignIn
+    override fun isUserSignIn(context: Context): Boolean {
+        return SharedPrefUtil.getBoolean(context) { IS_USER_LOGIN }
     }
 
     @WorkerThread
@@ -135,10 +133,4 @@ internal class AuthDataRepository(
                 emit(this)
             }
     }.flowOn(Dispatchers.IO)
-
-    override fun storeUserTokenAndId(token: String, userId: Int) {
-        prefStorage.isUserSignIn = true
-        prefStorage.tokenBearer = token
-        prefStorage.userId = userId
-    }
 }

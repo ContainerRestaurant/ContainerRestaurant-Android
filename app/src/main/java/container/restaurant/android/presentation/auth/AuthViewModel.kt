@@ -2,11 +2,9 @@ package container.restaurant.android.presentation.auth
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.skydoves.sandwich.ApiResponse
 import com.skydoves.sandwich.StatusCode
 import container.restaurant.android.R
-import container.restaurant.android.data.PrefStorage
 import container.restaurant.android.data.repository.AuthRepository
 import container.restaurant.android.data.request.UpdateProfileRequest
 import container.restaurant.android.data.response.NicknameDuplicationCheckResponse
@@ -15,14 +13,11 @@ import container.restaurant.android.data.response.UserInfoResponse
 import container.restaurant.android.presentation.base.BaseViewModel
 import container.restaurant.android.util.Event
 import container.restaurant.android.util.SingleLiveEvent
-import container.restaurant.android.util.ValidationCheck
 import container.restaurant.android.util.handleApiResponse
 import kotlinx.coroutines.flow.collect
 import timber.log.Timber
-import java.util.regex.Pattern
 
 class AuthViewModel(
-    private val prefStorage: PrefStorage,
     private val authRepository: AuthRepository
 ) : BaseViewModel() {
 
@@ -60,8 +55,6 @@ class AuthViewModel(
         MutableLiveData<NicknameDuplicationCheckResponse>()
     val nicknameDuplicationCheckResult: LiveData<NicknameDuplicationCheckResponse> =
         _nicknameDuplicationCheckResult
-
-    fun isUserSignIn() = authRepository.isUserSignIn()
 
     fun onCompleteButtonClick() {
         _isCompleteButtonClicked.value = Event(true)
@@ -111,7 +104,7 @@ class AuthViewModel(
             }
     }
 
-    suspend fun generateAccessToken(provider: String, accessToken: String) {
+    suspend fun generateAccessToken(provider: String, accessToken: String, onGenerateSuccess: (token: String?, userId: Int?) -> Unit, onGenerateFail: () -> Unit) {
         authRepository.generateAccessToken(
             provider = provider,
             accessToken = accessToken
@@ -119,34 +112,24 @@ class AuthViewModel(
             handleApiResponse(
                 response = response,
                 onSuccess = {
-                    if (it.data?.token != null && it.data?.id != null) {
-                        storeUserTokenAndId("Bearer ${it.data?.token}", it.data?.id!!)
-                    }
-                    _isGenerateAccessTokenSuccess.call()
+                    onGenerateSuccess(it.data?.token, it.data?.id)
                 },
                 onError = {
-                    when (it.statusCode) {
-                        StatusCode.BadRequest -> {
-                            // 올바르지 않은 닉네임
-                        }
-                        else -> {
-                            _errorMessageId.value = Event(R.string.error_message_other)
-                        }
-                    }
+                    onGenerateFail()
                 }, onException = {
-                    _errorMessageId.value = Event(R.string.error_message_other)
+                    onGenerateFail()
                 }
             )
         }
     }
 
     suspend fun signInWithAccessToken(
+        tokenBearer: String,
         onNicknameNull: () -> Unit = {},
         onSignInSuccess: (UserInfoResponse) -> Unit = {},
         onInvalidToken: () -> Unit = {}
     ) {
-        Timber.d("prefStorage.tokenBearer ${prefStorage.tokenBearer}")
-        authRepository.signInWithAccessToken(prefStorage.tokenBearer)
+        authRepository.signInWithAccessToken(tokenBearer)
             .collect { response ->
                 handleApiResponse(response = response,
                     onSuccess = {
@@ -156,7 +139,6 @@ class AuthViewModel(
                         } else {
                             it.data?.let { userInfoResponse ->
                                 onSignInSuccess(userInfoResponse)
-                                this.userInfoResponse.value = it.data
                             }
                             _isSignInWithAccessTokenSuccess.call()
                         }
@@ -170,10 +152,10 @@ class AuthViewModel(
             }
     }
 
-    suspend fun updateProfile(updateProfileRequest: UpdateProfileRequest? = null) {
+    suspend fun updateProfile(tokenBearer: String, userId: Int, updateProfileRequest: UpdateProfileRequest? = null) {
         authRepository.updateProfile(
-            prefStorage.tokenBearer,
-            prefStorage.userId,
+            tokenBearer,
+            userId,
             updateProfileRequest
         )
             .collect { response ->
@@ -184,9 +166,5 @@ class AuthViewModel(
                     }
                 )
             }
-    }
-
-    private fun storeUserTokenAndId(token: String, id: Int) {
-        authRepository.storeUserTokenAndId(token, id)
     }
 }

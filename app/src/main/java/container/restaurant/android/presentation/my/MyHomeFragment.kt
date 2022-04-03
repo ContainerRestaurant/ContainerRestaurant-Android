@@ -6,12 +6,12 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import container.restaurant.android.R
-import container.restaurant.android.data.SharedPrefStorage
 import container.restaurant.android.data.response.UserInfoResponse
 import container.restaurant.android.databinding.FragmentMyHomeBinding
 import container.restaurant.android.presentation.auth.KakaoSignInDialogFragment
 import container.restaurant.android.presentation.base.BaseFragment
 import container.restaurant.android.util.EventObserver
+import container.restaurant.android.util.SharedPrefUtil
 import container.restaurant.android.util.observe
 import container.restaurant.android.util.setUserProfileResByLevelTitle
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -49,7 +49,7 @@ class MyHomeFragment : BaseFragment<FragmentMyHomeBinding, MyViewModel>() {
         }
 
         // 프로젝트에 저장된 토큰 없을 때
-        if (!SharedPrefStorage(requireContext()).isUserSignIn) {
+        if (!SharedPrefUtil.getBoolean(requireContext()) { IS_USER_LOGIN }) {
             val kakaoSignInDialogFragment = KakaoSignInDialogFragment(
                 onSignInSuccess = onSignInSuccess,
                 onClose = { parentFragment?.parentFragmentManager?.popBackStack() }
@@ -60,7 +60,9 @@ class MyHomeFragment : BaseFragment<FragmentMyHomeBinding, MyViewModel>() {
         // 프로젝트에 저장된 토큰 있을 때
         else {
             lifecycleScope.launchWhenCreated {
+                val tokenBearer = SharedPrefUtil.getString(requireContext()) { TOKEN_BEARER }
                 viewModel.signInWithAccessToken(
+                    tokenBearer,
                     onNicknameNull = {},
                     onSignInSuccess = onSignInSuccess,
                     onInvalidToken = {}

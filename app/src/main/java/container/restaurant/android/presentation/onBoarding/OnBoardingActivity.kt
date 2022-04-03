@@ -1,14 +1,13 @@
 package container.restaurant.android.presentation.onBoarding
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.tbuonomo.viewpagerdotsindicator.DotsIndicator
 import container.restaurant.android.R
-import container.restaurant.android.data.SharedPrefStorage
 import container.restaurant.android.presentation.MainActivity
 
 //복잡한 구조를 선택할 필요가 없어 MVC로 진행함

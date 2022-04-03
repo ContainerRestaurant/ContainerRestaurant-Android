@@ -11,7 +11,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.tabs.TabLayoutMediator
-import container.restaurant.android.data.SharedPrefStorage
 import container.restaurant.android.data.response.UserInfoResponse
 import container.restaurant.android.databinding.FragmentHomeBinding
 import container.restaurant.android.dialog.SimpleConfirmDialog
@@ -36,7 +35,8 @@ internal class HomeFragment : Fragment() {
     // 가입 완료후 업데이트 할 정보
     private fun updateData() {
         lifecycleScope.launchWhenCreated {
-            viewModel.getHomeInfo()
+            val tokenBearer = SharedPrefUtil.getString(requireContext()) { TOKEN_BEARER }
+            viewModel.getHomeInfo(tokenBearer)
         }
     }
     private val signUpResultLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
@@ -50,7 +50,8 @@ internal class HomeFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if(it.resultCode == Activity.RESULT_OK) {
                 lifecycleScope.launchWhenCreated {
-                    viewModel.getHomeInfo()
+                    val tokenBearer = SharedPrefUtil.getString(requireContext()) { TOKEN_BEARER }
+                    viewModel.getHomeInfo(tokenBearer)
                 }
             }
         }
@@ -120,7 +121,8 @@ internal class HomeFragment : Fragment() {
 
     private fun getHomeInfo() {
         lifecycleScope.launchWhenCreated {
-            viewModel.getHomeInfo()
+            val tokenBearer = SharedPrefUtil.getString(requireContext()) { TOKEN_BEARER }
+            viewModel.getHomeInfo(tokenBearer)
         }
     }
 
@@ -141,11 +143,12 @@ internal class HomeFragment : Fragment() {
                 // 로그인 성공 했을 때 동작
                 val onSignInSuccess: (UserInfoResponse) -> Unit = {
                     lifecycleScope.launchWhenCreated {
-                        viewModel.getHomeInfo()
+                        val tokenBearer = SharedPrefUtil.getString(requireContext()) { TOKEN_BEARER }
+                        viewModel.getHomeInfo(tokenBearer)
                     }
                 }
                 dialogSelf.dismiss()
-                if (!viewModel.isUserSignIn()) {
+                if (!SharedPrefUtil.getBoolean(requireContext()) { IS_USER_LOGIN }) {
                     KakaoSignInDialogFragment(
                         onSignInSuccess = onSignInSuccess,
                         onClose = { parentFragment?.parentFragmentManager?.popBackStack() }
@@ -178,13 +181,14 @@ internal class HomeFragment : Fragment() {
                 startActivity(UserProfileActivity.getIntent(requireContext()))
             }
             lifecycleScope.launchWhenCreated {
-                viewModel.getHomeInfo()
+                val tokenBearer = SharedPrefUtil.getString(requireContext()) { TOKEN_BEARER }
+                viewModel.getHomeInfo(tokenBearer)
             }
         }
 
 
         // 프로젝트에 저장된 토큰 없을 때
-        if (!SharedPrefStorage(requireContext()).isUserSignIn) {
+        if (!SharedPrefUtil.getBoolean(requireContext()) { IS_USER_LOGIN }) {
             val kakaoSignInDialogFragment = KakaoSignInDialogFragment(
                 onSignInSuccess = onSignInSuccess,
                 onClose = { parentFragment?.parentFragmentManager?.popBackStack() }
@@ -195,7 +199,9 @@ internal class HomeFragment : Fragment() {
         // 프로젝트에 저장된 토큰 있을 때
         else {
             lifecycleScope.launchWhenCreated {
+                val tokenBearer = SharedPrefUtil.getString(requireContext()) { TOKEN_BEARER }
                 viewModel.signInWithAccessToken(
+                    tokenBearer,
                     onNicknameNull = {},
                     onSignInSuccess = onSignInSuccess,
                     onInvalidToken = {}

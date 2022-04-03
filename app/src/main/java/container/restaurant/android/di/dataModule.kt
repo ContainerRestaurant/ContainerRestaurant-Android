@@ -6,14 +6,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import container.restaurant.android.DATABASE_NAME
-import container.restaurant.android.data.repository.AuthDataRepository
-import container.restaurant.android.data.repository.AuthRepository
-import container.restaurant.android.data.PrefStorage
-import container.restaurant.android.data.SharedPrefStorage
 import container.restaurant.android.data.db.AppDatabase
 import container.restaurant.android.data.repository.*
-import container.restaurant.android.data.repository.FeedExploreRepository
-import container.restaurant.android.data.repository.ResDataRepository
 import container.restaurant.android.worker.MainFoodDatabaseWorker
 import container.restaurant.android.worker.SideDishDatabaseWorker
 import org.koin.android.ext.koin.androidContext
@@ -21,10 +15,9 @@ import org.koin.dsl.module
 
 
 val dataModule = module {
-    single<PrefStorage> { SharedPrefStorage(androidContext()) }
-    single<AuthRepository> { AuthDataRepository(get(), get()) }
+    single<AuthRepository> { AuthDataRepository(get()) }
     single<FeedExploreRepository> { FeedExploreRepository(get()) }
-    single<FeedWriteRepository> { FeedWriteRepository(get(), get()) }
+    single<FeedWriteRepository> { FeedWriteRepository(get(), get(), get()) }
     single<MyRepository> { MyRepository(get())  }
     single<RestaurantRepository> { ResDataRepository(get()) }
     single<HomeRepository> { HomeRepository(get())}

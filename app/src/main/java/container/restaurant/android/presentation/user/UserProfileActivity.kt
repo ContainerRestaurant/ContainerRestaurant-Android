@@ -10,6 +10,7 @@ import container.restaurant.android.R
 import container.restaurant.android.databinding.ActivityUserProfileBinding
 import container.restaurant.android.presentation.home.HomeViewModel
 import container.restaurant.android.util.CommUtils
+import container.restaurant.android.util.SharedPrefUtil
 import container.restaurant.android.util.observe
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -47,7 +48,7 @@ internal class UserProfileActivity : AppCompatActivity() {
     }
 
     private fun getUserData() {
-        if (viewModel.isUserSignIn()) {
+        if (SharedPrefUtil.getBoolean(this@UserProfileActivity) { IS_USER_LOGIN }) {
             lifecycleScope.launchWhenCreated {
                 viewModel.getUserFeedList()
                 viewModel.getUserInfo()

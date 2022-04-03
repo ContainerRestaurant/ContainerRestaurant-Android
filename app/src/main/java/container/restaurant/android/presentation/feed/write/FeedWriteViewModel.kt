@@ -3,10 +3,12 @@ package container.restaurant.android.presentation.feed.write
 import androidx.lifecycle.*
 import container.restaurant.android.data.*
 import container.restaurant.android.data.repository.FeedWriteRepository
+import container.restaurant.android.data.request.FeedWriteRequest
 import container.restaurant.android.data.response.SearchLocationResponse
 import container.restaurant.android.presentation.base.BaseViewModel
 import container.restaurant.android.util.Event
 import container.restaurant.android.util.RecyclerViewItemClickListeners
+import container.restaurant.android.util.SingleLiveEvent
 import container.restaurant.android.util.handleApiResponse
 import kotlinx.coroutines.flow.collect
 import timber.log.Timber
@@ -31,33 +33,6 @@ internal class FeedWriteViewModel(private val feedWriteRepository: FeedWriteRepo
     val foodPhotoList: MutableLiveData<MutableList<FoodPhoto>> = MutableLiveData(
         mutableListOf()
     )
-
-    private val _isAddPhotoButtonClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
-    val isAddPhotoButtonClicked: LiveData<Event<Boolean>> = _isAddPhotoButtonClicked
-
-    private val _isBackButtonClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
-    val isBackButtonClicked: LiveData<Event<Boolean>> = _isBackButtonClicked
-
-    private val _isWelcomedButtonClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
-    val isWelcomedButtonClicked: LiveData<Event<Boolean>> = _isWelcomedButtonClicked
-
-    private val _isCloseSearchButtonClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
-    val isCloseSearchButtonClicked: LiveData<Event<Boolean>> = _isCloseSearchButtonClicked
-
-    private val _isSearchButtonClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
-    val isSearchButtonClicked: LiveData<Event<Boolean>> = _isSearchButtonClicked
-
-    private val _isSearchEditTextClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
-    val isSearchEditTextClicked: LiveData<Event<Boolean>> = _isSearchEditTextClicked
-
-    private val _isSearchResultItemClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
-    val isSearchResultItemClicked: LiveData<Event<Boolean>> = _isSearchResultItemClicked
-
-    private val _isErasePlaceNameClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
-    val isErasePlaceNameClicked: LiveData<Event<Boolean>> = _isErasePlaceNameClicked
-
-    private val _isEraseSearchPlaceNameClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
-    val isEraseSearchPlaceNameClicked: LiveData<Event<Boolean>> = _isEraseSearchPlaceNameClicked
 
     private val _searchLocationList =
         MutableLiveData<List<SearchLocationResponse.Item>>()
@@ -87,48 +62,6 @@ internal class FeedWriteViewModel(private val feedWriteRepository: FeedWriteRepo
     // 사용자가 선택한 음식 카테고리를 저장하는 변수. 선택되지 않았으면 null임
     var selectedFoodCategory: FoodCategory? = null
 
-    fun onAddPhotoButtonClick() {
-        _isAddPhotoButtonClicked.value = Event(true)
-    }
-
-    fun onBackButtonClick() {
-        _isBackButtonClicked.value = Event(true)
-    }
-
-    fun onWelcomedButtonClick() {
-        isWelcomed = !isWelcomed
-        _isWelcomedButtonClicked.value = Event(isWelcomed)
-    }
-
-    fun onCloseSearchButtonClick() {
-        _isCloseSearchButtonClicked.value = Event(true)
-    }
-
-    fun onSearchButtonClick() {
-        _isSearchButtonClicked.value = Event(true)
-    }
-
-    fun onSearchEditTextClick() {
-        _isSearchEditTextClicked.value = Event(true)
-    }
-
-    fun onAddMainMenuButtonClick() {
-        _mainMenuList.value?.add(MainMenu())
-        _mainMenuList.value = _mainMenuList.value
-    }
-
-    fun onAddSubMenuButtonClick() {
-        _subMenuList.value?.add(SubMenu())
-        _subMenuList.value = _subMenuList.value
-    }
-
-    fun onErasePlaceNameClick() {
-        _isErasePlaceNameClicked.value = Event(true)
-    }
-
-    fun onEraseSearchPlaceNameClick() {
-        _isEraseSearchPlaceNameClicked.value = Event(true)
-    }
 
     fun erasePlaceName() {
         _placeName.value = ""
@@ -137,7 +70,6 @@ internal class FeedWriteViewModel(private val feedWriteRepository: FeedWriteRepo
     fun makeSearchResultEmpty() {
         _searchLocationList.value = listOf()
     }
-
 
     suspend fun getSearchPlace(placeName: String) {
         feedWriteRepository.getSearchLocation(placeName)
@@ -163,6 +95,102 @@ internal class FeedWriteViewModel(private val feedWriteRepository: FeedWriteRepo
             }
     }
 
+    suspend fun postFeed(tokenBearer: String, feedWriteRequest: FeedWriteRequest) {
+        feedWriteRepository.postFeed(tokenBearer, feedWriteRequest)
+            .collect { response ->
+                handleApiResponse(
+                    response = response,
+                    onSuccess = {
+
+                    },
+                    onError = {
+
+                    },
+                    onException = {
+
+                    }
+                )
+            }
+    }
+
+    // 클릭 이벤트들
+    private val _isAddPhotoButtonClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
+    val isAddPhotoButtonClicked: LiveData<Event<Boolean>> = _isAddPhotoButtonClicked
+
+    fun onAddPhotoButtonClick() {
+        _isAddPhotoButtonClicked.value = Event(true)
+    }
+
+    private val _isBackButtonClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
+    val isBackButtonClicked: LiveData<Event<Boolean>> = _isBackButtonClicked
+
+    fun onBackButtonClick() {
+        _isBackButtonClicked.value = Event(true)
+    }
+
+    private val _isWelcomedButtonClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
+    val isWelcomedButtonClicked: LiveData<Event<Boolean>> = _isWelcomedButtonClicked
+
+    fun onWelcomedButtonClick() {
+        isWelcomed = !isWelcomed
+        _isWelcomedButtonClicked.value = Event(isWelcomed)
+    }
+
+    private val _isCloseSearchButtonClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
+    val isCloseSearchButtonClicked: LiveData<Event<Boolean>> = _isCloseSearchButtonClicked
+
+    fun onCloseSearchButtonClick() {
+        _isCloseSearchButtonClicked.value = Event(true)
+    }
+
+    private val _isSearchButtonClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
+    val isSearchButtonClicked: LiveData<Event<Boolean>> = _isSearchButtonClicked
+
+    fun onSearchButtonClick() {
+        _isSearchButtonClicked.value = Event(true)
+    }
+
+    private val _isSearchEditTextClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
+    val isSearchEditTextClicked: LiveData<Event<Boolean>> = _isSearchEditTextClicked
+
+    fun onSearchEditTextClick() {
+        _isSearchEditTextClicked.value = Event(true)
+    }
+
+    private val _isSearchResultItemClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
+    val isSearchResultItemClicked: LiveData<Event<Boolean>> = _isSearchResultItemClicked
+
+    override fun onSearchResultItemClick(item: SearchLocationResponse.Item) {
+        _placeName.value = item.title
+        _isSearchResultItemClicked.value = Event(true)
+    }
+
+    private val _isErasePlaceNameClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
+    val isErasePlaceNameClicked: LiveData<Event<Boolean>> = _isErasePlaceNameClicked
+
+    fun onErasePlaceNameClick() {
+        _isErasePlaceNameClicked.value = Event(true)
+    }
+
+    private val _isEraseSearchPlaceNameClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
+    val isEraseSearchPlaceNameClicked: LiveData<Event<Boolean>> = _isEraseSearchPlaceNameClicked
+
+    fun onEraseSearchPlaceNameClick() {
+        _isEraseSearchPlaceNameClicked.value = Event(true)
+    }
+
+    private val _isCompleteClicked = SingleLiveEvent<Void>()
+    val isCompleteClicked: LiveData<Void> = _isCompleteClicked
+
+    fun onCompleteClick() {
+        _isCompleteClicked.call()
+    }
+
+    override fun onDeleteClick(adapterPosition: Int) {
+        foodPhotoList.value?.removeAt(adapterPosition)
+        foodPhotoList.value = foodPhotoList.value
+    }
+
     override fun onCategorySelectionItemClick(item: CategorySelection, adapterPosition: Int) {
         Timber.d("$item, $adapterPosition")
         if (item.checked.value != null) {
@@ -181,50 +209,13 @@ internal class FeedWriteViewModel(private val feedWriteRepository: FeedWriteRepo
         }
     }
 
-    override fun onDeleteClick(adapterPosition: Int) {
-        foodPhotoList.value?.removeAt(adapterPosition)
-        foodPhotoList.value = foodPhotoList.value
+    fun onAddMainMenuButtonClick() {
+        _mainMenuList.value?.add(MainMenu())
+        _mainMenuList.value = _mainMenuList.value
     }
 
-    override fun onSearchResultItemClick(item: SearchLocationResponse.Item) {
-        _placeName.value = item.title
-        _isSearchResultItemClicked.value = Event(true)
+    fun onAddSubMenuButtonClick() {
+        _subMenuList.value?.add(SubMenu())
+        _subMenuList.value = _subMenuList.value
     }
-
-    //    val mainFoodList = feedWriteRepository.getMainFoodList().asLiveData()
-//    val sideDishList = feedWriteRepository.getSideDishList().asLiveData()
-
-//    fun addMainFood(list: List<MainFood>) = feedWriteRepository.addMainFood(list).asLiveData()
-//    fun addSideDish(list: List<SideDish>) = feedWriteRepository.addSideDish(list).asLiveData()
-//
-//    val searchProgressChk = MutableStateFlow(false)
-//    fun getSearchPlace(place: String) = feedWriteRepository.getSearchPlace(
-//        place = place,
-//        onStart = { searchProgressChk.value = true },
-//        onComplete = { searchProgressChk.value = false },
-//        onError = {getErrorMsg.postValue(it)}
-//
-//    ).asLiveData()
-//
-//    val loginChk = MutableStateFlow(false)
-//
-//    fun tempLogin() = feedWriteRepository.tempLogin (
-//        onStart = { viewLoading.postValue(true) },
-//        onComplete = {viewLoading.postValue(false); loginChk.value = true},
-//        onError = { getErrorMsg.postValue(it) }
-//    ).asLiveData()
-//
-//    fun updateFeed(feedWriteRequest: FeedWriteRequest) = feedWriteRepository.updateFeed(
-//        feedWriteRequest= feedWriteRequest,
-//        onStart = { viewLoading.postValue(true) },
-//        onComplete = { viewLoading.postValue(false) },
-//        onError = {getErrorMsg.postValue(it)}
-//    ).asLiveData()
-//
-//    fun uploadImg(bmpFile: File) = feedWriteRepository.uploadImg(
-//        bmpFile = bmpFile,
-//        onStart = {viewLoading.postValue(true)},
-//        onComplete = {viewLoading.postValue(false)},
-//        onError = {getErrorMsg.postValue(it)}
-//    ).asLiveData()
 }

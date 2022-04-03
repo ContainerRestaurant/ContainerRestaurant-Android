@@ -5,12 +5,14 @@ import com.skydoves.sandwich.*
 import container.restaurant.android.data.db.AppDatabase
 import container.restaurant.android.data.db.entity.MainFood
 import container.restaurant.android.data.db.entity.SideDish
+import container.restaurant.android.data.remote.FeedWriteService
 import container.restaurant.android.data.remote.LocationService
 import container.restaurant.android.data.remote.MyService
 import container.restaurant.android.data.request.FeedWriteRequest
 import container.restaurant.android.presentation.feed.write.PlaceService
 import container.restaurant.android.util.CommUtils
 import container.restaurant.android.util.ErrorResponseMapper
+import container.restaurant.android.util.flowApiResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -23,7 +25,8 @@ import java.io.File
 
 class FeedWriteRepository(
     private val roomDatabase: AppDatabase,
-    private val locationService: LocationService
+    private val locationService: LocationService,
+    private val feedWriteService: FeedWriteService
 ) {
 
     private val mainFoodDao by lazy { roomDatabase.mainFoodDao() }
@@ -46,6 +49,12 @@ class FeedWriteRepository(
                 emit(this)
             }
     }.flowOn(Dispatchers.IO)
+
+    @WorkerThread
+    suspend fun postFeed(
+        tokenBearer: String,
+        feedWriteRequest: FeedWriteRequest
+    ) = flowApiResponse(feedWriteService.postFeed(tokenBearer, feedWriteRequest))
 
 //    @WorkerThread
 //    fun addMainFood(list: List<MainFood>) = flow {

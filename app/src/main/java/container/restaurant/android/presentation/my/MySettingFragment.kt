@@ -11,6 +11,7 @@ import container.restaurant.android.dialog.SimpleConfirmDialog
 import container.restaurant.android.presentation.MainActivity
 import container.restaurant.android.presentation.NavigationController
 import container.restaurant.android.util.EventObserver
+import container.restaurant.android.util.logOut
 import container.restaurant.android.util.observe
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -59,7 +60,7 @@ class MySettingFragment : Fragment() {
                 if(activity is MainActivity) {
                     (activity as MainActivity).viewDataBinding.bottomNav.selectedItemId = MainActivity.BottomNavItem.HOME.menuId
                 }
-                viewModel.logOut()
+                logOut(requireContext())
                 dialogSelf.dismiss()
             }
         })

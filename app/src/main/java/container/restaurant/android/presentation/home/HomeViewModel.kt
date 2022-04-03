@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.skydoves.sandwich.StatusCode
-import container.restaurant.android.data.PrefStorage
 import container.restaurant.android.data.repository.AuthRepository
 import container.restaurant.android.data.repository.HomeRepository
 import container.restaurant.android.data.response.FeedListResponse
@@ -17,7 +16,6 @@ import kotlinx.coroutines.flow.collect
 import timber.log.Timber
 
 internal class HomeViewModel(
-    private val prefStorage: PrefStorage,
     private val authRepository: AuthRepository,
     private val homeRepository: HomeRepository
 ) : ViewModel() {
@@ -81,12 +79,8 @@ internal class HomeViewModel(
         _isBackButtonClicked.value = Event(true)
     }
 
-    fun isUserSignIn(): Boolean {
-        return prefStorage.isUserSignIn
-    }
-
-    suspend fun getHomeInfo() {
-        homeRepository.getHomeInfo(prefStorage.tokenBearer)
+    suspend fun getHomeInfo(tokenBearer: String) {
+        homeRepository.getHomeInfo(tokenBearer)
             .collect { response ->
                 handleApiResponse(
                     response = response,
@@ -144,11 +138,12 @@ internal class HomeViewModel(
     }
 
     suspend fun signInWithAccessToken(
+        tokenBearer: String,
         onNicknameNull: () -> Unit = {},
         onSignInSuccess: (UserInfoResponse) -> Unit = {},
         onInvalidToken: () -> Unit = {}
     ) {
-        authRepository.signInWithAccessToken(prefStorage.tokenBearer)
+        authRepository.signInWithAccessToken(tokenBearer)
             .collect { response ->
                 handleApiResponse(response = response,
                     onSuccess = {

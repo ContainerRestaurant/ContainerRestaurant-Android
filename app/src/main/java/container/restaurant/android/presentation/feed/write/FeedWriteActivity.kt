@@ -121,6 +121,9 @@ internal class FeedWriteActivity : BaseActivity<ActivityFeedWriteBinding, FeedWr
                 }
             })
 
+            isCompleteClicked.observe(this@FeedWriteActivity) {
+
+            }
         }
     }
 

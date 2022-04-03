@@ -2,7 +2,15 @@ package container.restaurant.android.util
 
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
+import com.skydoves.sandwich.ApiResponse
+import com.skydoves.sandwich.suspendOnError
+import com.skydoves.sandwich.suspendOnException
+import com.skydoves.sandwich.suspendOnSuccess
 import container.restaurant.android.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 fun setUserProfileResByLevelTitle(context: Context, userProfileRes: MutableLiveData<Int>, userLevelTitle: String?) {
     when(userLevelTitle) {
@@ -33,3 +41,17 @@ fun setHomeIconByLevelTitle(context: Context, homeIconResByUserLevel: MutableLiv
             R.drawable.ic_home_lv5
     }
 }
+
+fun <T> flowApiResponse(response: ApiResponse<T>): Flow<ApiResponse<T>> =
+    flow {
+        response
+            .suspendOnSuccess {
+                emit(this)
+            }
+            .suspendOnError {
+                emit(this)
+            }
+            .suspendOnException {
+                emit(this)
+            }
+    }.flowOn(Dispatchers.IO)

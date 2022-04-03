@@ -62,12 +62,12 @@ internal class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>()
 
     private fun logInAndFeedWrite() {
         // 로그인 성공 했을 때 동작
-        val onSignInSuccess: (UserInfoResponse) -> Unit = {
+        val onSignInSuccess: (UserInfoResponse?) -> Unit = {
             startActivity(FeedWriteActivity.getIntent(this@MainActivity))
         }
 
         // 프로젝트에 저장된 토큰 없을 때
-        if (!authViewModel.isUserSignIn()) {
+        if (!SharedPrefUtil.getBoolean(this@MainActivity) { IS_USER_LOGIN }) {
             Timber.d("user not signIn")
             val kakaoSignInDialogFragment = KakaoSignInDialogFragment(
                 onSignInSuccess = onSignInSuccess
@@ -78,10 +78,9 @@ internal class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>()
         // 프로젝트에 저장된 토큰 있을 때
         else {
             lifecycleScope.launchWhenCreated {
-                ifAlreadySignIn(authViewModel, this@MainActivity)
+                ifAlreadySignIn(authViewModel, this@MainActivity, onSignInSuccess)
             }
         }
-        observeAuthViewModelUserInfo(this@MainActivity, authViewModel, onSignInSuccess)
     }
 
 

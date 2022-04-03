@@ -1,20 +1,13 @@
 package container.restaurant.android.util
 
 import android.content.Context
-import android.content.Intent
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.whenCreated
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
 import container.restaurant.android.data.response.UserInfoResponse
 import container.restaurant.android.presentation.auth.AuthViewModel
-import container.restaurant.android.presentation.auth.KakaoSignInDialogFragment
-import container.restaurant.android.presentation.auth.SignUpActivity
 import timber.log.Timber
 import java.util.regex.Pattern
 
@@ -71,9 +64,13 @@ fun lengthShortValidationCheck(string: String): Boolean {
  **/
 suspend fun ifAlreadySignIn(
     authViewModel: AuthViewModel,
-    fragmentActivity: FragmentActivity
+    fragmentActivity: FragmentActivity,
+    onSignInSuccess: (UserInfoResponse?) -> Unit,
 ) {
+    val tokenBearer = SharedPrefUtil.getString(fragmentActivity) { TOKEN_BEARER }
     authViewModel.signInWithAccessToken(
+        tokenBearer,
+        onSignInSuccess = onSignInSuccess,
         onInvalidToken = {
             kakaoLogin(fragmentActivity) { token, err ->
                 if (err != null) {
@@ -95,7 +92,15 @@ suspend fun ifAlreadySignIn(
                             fragmentActivity.lifecycleScope.launchWhenCreated {
                                 authViewModel.generateAccessToken(
                                     provider,
-                                    kakaoAccessToken
+                                    kakaoAccessToken,
+                                    onGenerateSuccess = { token, userId ->
+                                        SharedPrefUtil.setBoolean(fragmentActivity, { IS_USER_LOGIN }, true)
+                                        if(token != null) SharedPrefUtil.setString(fragmentActivity, { TOKEN_BEARER }, "Bearer $token")
+                                        if(userId != null) SharedPrefUtil.setInt(fragmentActivity, { USER_ID }, userId)
+                                        onSignInSuccess(null)
+                                    }, onGenerateFail = {
+                                        Toast.makeText(fragmentActivity, "회원가입 혹은 로그인에 실패하였습니다.", Toast.LENGTH_SHORT).show()
+                                    }
                                 )
                             }
                         }
@@ -106,20 +111,6 @@ suspend fun ifAlreadySignIn(
     )
 }
 
-fun observeAuthViewModelUserInfo(lifecycleOwner: LifecycleOwner, authViewModel: AuthViewModel, onSignInSuccess: (UserInfoResponse) -> Unit) {
-    with(authViewModel) {
-        userInfoResponse.observe(lifecycleOwner, object : Observer<UserInfoResponse> {
-            override fun onChanged(it: UserInfoResponse?) {
-                if(it!=null){
-                    onSignInSuccess(it)
-                    // 옵저빙 뒤에는 현재 옵저버를 제거해줌
-                    userInfoResponse.removeObserver(this)
-                }
-            }
-        })
-    }
-}
-
 fun kakaoLogin(context: Context, callback:(OAuthToken?, Throwable?) -> Unit) {
     val kakaoUserApi = UserApiClient.instance
     if (kakaoUserApi.isKakaoTalkLoginAvailable(context)) {
@@ -127,4 +118,10 @@ fun kakaoLogin(context: Context, callback:(OAuthToken?, Throwable?) -> Unit) {
     } else {
         kakaoUserApi.loginWithKakaoAccount(context, callback = callback)
     }
+}
+
+fun logOut(context: Context) {
+    SharedPrefUtil.setBoolean(context, { IS_USER_LOGIN }, false)
+    SharedPrefUtil.setInt(context, { USER_ID }, SharedPrefManager.DEFAULT_VALUE_INT)
+    SharedPrefUtil.setString(context, { TOKEN_BEARER }, SharedPrefManager.DEFAULT_VALUE_STRING)
 }

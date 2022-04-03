@@ -548,6 +548,7 @@
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btn_feed_update"
                 style="@style/TextAppearance.App.B.Gray01"
+                android:onClick="@{()->viewModel.onCompleteClick()}"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:layout_marginStart="16dp"

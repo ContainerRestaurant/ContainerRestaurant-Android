@@ -1,5 +1,6 @@
 package container.restaurant.android.presentation.auth
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,11 +8,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import container.restaurant.android.R
-import container.restaurant.android.data.request.UpdateProfileRequest
 import container.restaurant.android.databinding.FragmentSignUpBinding
+import container.restaurant.android.presentation.base.BaseFragment
 import container.restaurant.android.presentation.user.UserProfileActivity
 import container.restaurant.android.util.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,11 +20,9 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-internal class SignUpFragment : Fragment() {
-
-    private lateinit var binding: FragmentSignUpBinding
-
-    val viewModel: AuthViewModel by viewModel()
+internal class SignUpFragment : BaseFragment<FragmentSignUpBinding, AuthViewModel>() {
+    override val layoutResId: Int = R.layout.fragment_sign_up
+    override val viewModel: AuthViewModel by viewModel()
 
     private val nicknameEditing = MutableStateFlow("")
 
@@ -38,16 +36,10 @@ internal class SignUpFragment : Fragment() {
         arguments?.getString(DataTransfer.ACCESS_TOKEN)
     }
 
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        binding = FragmentSignUpBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = viewLifecycleOwner
+        viewDataBinding.viewModel = viewModel
+        viewDataBinding.lifecycleOwner = viewLifecycleOwner
 
         observeData()
         setupNicknameEditing()
@@ -76,7 +68,18 @@ internal class SignUpFragment : Fragment() {
         viewModel.isCompleteButtonClicked.observe(viewLifecycleOwner, EventObserver {
             lifecycleScope.launchWhenCreated {
                 if(provider!=null && accessToken!=null){
-                    viewModel.generateAccessToken(provider!!, accessToken!!)
+                    viewModel.generateAccessToken(provider!!, accessToken!!
+                        ,onGenerateSuccess = { token, userId ->
+                            SharedPrefUtil.setBoolean(requireContext(), { IS_USER_LOGIN }, true)
+                            if(token != null) SharedPrefUtil.setString(requireContext(), { TOKEN_BEARER }, "Bearer $token")
+                            if(userId != null) SharedPrefUtil.setInt(requireContext(), { USER_ID }, userId)
+                            requireActivity().apply {
+                                setResult(Activity.RESULT_OK)
+                                finish()
+                            }
+                        }, onGenerateFail = {
+                            toastShortOfFailMessage("회원가입 혹은 로그인")
+                        })
                 }
             }
         })
@@ -85,17 +88,17 @@ internal class SignUpFragment : Fragment() {
     //버튼 활성화 설정
     private fun setBtnCompleteValidation(isValidate: Boolean) {
         if(isValidate) {
-            binding.tvNicknameError.setTextColor(ContextCompat.getColor(requireContext(), R.color.green_03))
+            viewDataBinding.tvNicknameError.setTextColor(ContextCompat.getColor(requireContext(), R.color.green_03))
         }
         else {
-            binding.tvNicknameError.setTextColor(ContextCompat.getColor(requireContext(), R.color.orange_02))
+            viewDataBinding.tvNicknameError.setTextColor(ContextCompat.getColor(requireContext(), R.color.orange_02))
         }
-        binding.btnComplete.isActivated = isValidate
+        viewDataBinding.btnComplete.isActivated = isValidate
     }
 
     //nickname 입력 리스너 설정
     private fun setupNicknameEditing() {
-        binding.editNickname.doOnTextChanged { text, _, _, _ ->
+        viewDataBinding.editNickname.doOnTextChanged { text, _, _, _ ->
             nicknameEditing.value = text.toString()
             // 사용자가 처음 수정 이후에 안내 메세지를 보여주도록 함
             if(nicknameFirstEdited) {
