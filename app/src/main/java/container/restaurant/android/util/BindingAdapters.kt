@@ -5,15 +5,10 @@ import android.graphics.Typeface
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.StyleSpan
-import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.annotation.ColorInt
-import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.text.HtmlCompat
 import androidx.databinding.BindingAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -112,14 +107,6 @@ fun CircleImageView.setImageUrlWithoutBaseUrl(url: String?) {
             .load(fullUrl)
             .into(this)
     }
-}
-
-
-@BindingAdapter("bind:emptyProfileRes")
-fun ImageView.setEmptyProfileRes(@DrawableRes res: Int) {
-    Glide.with(this)
-        .load(res)
-        .into(this)
 }
 
 @BindingAdapter("bind:homeIcRes")
@@ -248,21 +235,21 @@ fun RatingBar.setClickable(boolean: String) {
     setmClickable(boolean.toBoolean())
 }
 
-@BindingAdapter(value = ["bind:levelTitle", "bind:profileUrl"], requireAll = true)
-fun ImageView.setIcByLevelTitle(levelTitle: String, profileUrl: String?) {
+@BindingAdapter(value = ["levelTitle", "profileUrl"], requireAll = true)
+fun ImageView.setIcByLevelTitle(levelTitle: String?, profileUrl: String?) {
     if (profileUrl == null) {
-        @DrawableRes var drawableRes: Int? = null
-        when (levelTitle) {
-            context.getString(R.string.empty_profile_lv1) -> drawableRes =
+        @DrawableRes val drawableRes = when (levelTitle) {
+            context.getString(R.string.empty_profile_lv1) ->
                 R.drawable.empty_profile_lv1
-            context.getString(R.string.empty_profile_lv2) -> drawableRes=
+            context.getString(R.string.empty_profile_lv2) ->
                 R.drawable.empty_profile_lv2
-            context.getString(R.string.empty_profile_lv3) -> drawableRes =
+            context.getString(R.string.empty_profile_lv3) ->
                 R.drawable.empty_profile_lv3
-            context.getString(R.string.empty_profile_lv4) -> drawableRes =
+            context.getString(R.string.empty_profile_lv4) ->
                 R.drawable.empty_profile_lv4
-            context.getString(R.string.empty_profile_lv5) -> drawableRes =
+            context.getString(R.string.empty_profile_lv5) ->
                 R.drawable.empty_profile_lv5
+            else -> R.drawable.empty_profile_lv1
 
         }
         Glide.with(this)

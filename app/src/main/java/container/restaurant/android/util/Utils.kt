@@ -24,6 +24,8 @@ fun setUserProfileResByLevelTitle(context: Context, userProfileRes: MutableLiveD
             R.drawable.empty_profile_lv4
         context.getString(R.string.empty_profile_lv5) -> userProfileRes.value =
             R.drawable.empty_profile_lv5
+        else -> userProfileRes.value =
+            R.drawable.empty_profile_lv1
     }
 }
 
@@ -39,6 +41,8 @@ fun setHomeIconByLevelTitle(context: Context, homeIconResByUserLevel: MutableLiv
             R.drawable.ic_home_lv4
         context.getString(R.string.empty_profile_lv5) -> homeIconResByUserLevel.value =
             R.drawable.ic_home_lv5
+        else -> homeIconResByUserLevel.value =
+            R.drawable.ic_home_lv1
     }
 }
 

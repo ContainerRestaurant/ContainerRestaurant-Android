@@ -47,7 +47,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="@{viewModel.userLevelTitle}"
+                    android:text="@{viewModel.userLevelTitle.empty || viewModel.userLevelTitle == null ? @string/empty_profile_lv1 : viewModel.userLevelTitle}"
                     android:textAppearance="@style/TextAppearance.App.B.Gray05"
                     android:textSize="12dp"
                     tools:ignore="SpUsage"
@@ -111,8 +111,8 @@
                             <ImageView
                                 android:layout_width="36dp"
                                 android:layout_height="36dp"
-                                bind:imageUrlWithBaseUrl="@{viewModel.userProfileUrl}"
-                                bind:emptyProfileRes="@{viewModel.userProfileRes}"
+                                bind:profileUrl="@{viewModel.userProfileUrl}"
+                                bind:levelTitle="@{viewModel.userLevelTitle}"
                                 android:contentDescription="@string/home_my_profile_img"
                                 />
                         </androidx.cardview.widget.CardView>
@@ -194,7 +194,8 @@
                                 <ImageView
                                     android:layout_width="36dp"
                                     android:layout_height="36dp"
-                                    bind:imageUrlWithBaseUrl="@{viewModel.latestWriterProfileList.get(0).profileImgUrl}"
+                                    bind:profileUrl="@{viewModel.latestWriterProfileList.get(2).profileImgUrl}"
+                                    bind:levelTitle="@{viewModel.latestWriterProfileList.get(2).levelTitle}"
                                     />
                             </androidx.cardview.widget.CardView>
                             <androidx.cardview.widget.CardView
@@ -210,7 +211,9 @@
                                 <ImageView
                                     android:layout_width="36dp"
                                     android:layout_height="36dp"
-                                    bind:imageUrlWithBaseUrl="@{viewModel.latestWriterProfileList.get(1).profileImgUrl}" />
+                                    bind:profileUrl="@{viewModel.latestWriterProfileList.get(1).profileImgUrl}"
+                                    bind:levelTitle="@{viewModel.latestWriterProfileList.get(1).levelTitle}"
+                                    />
                             </androidx.cardview.widget.CardView>
                             <androidx.cardview.widget.CardView
                                 android:layout_width="wrap_content"
@@ -225,7 +228,8 @@
                                 <ImageView
                                     android:layout_width="36dp"
                                     android:layout_height="36dp"
-                                    bind:imageUrlWithBaseUrl="@{viewModel.latestWriterProfileList.get(2).profileImgUrl}"
+                                    bind:profileUrl="@{viewModel.latestWriterProfileList.get(2).profileImgUrl}"
+                                    bind:levelTitle="@{viewModel.latestWriterProfileList.get(2).levelTitle}"
                                     />
                             </androidx.cardview.widget.CardView>
                         </androidx.constraintlayout.widget.ConstraintLayout>
