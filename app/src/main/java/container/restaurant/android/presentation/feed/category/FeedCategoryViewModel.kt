@@ -1,18 +1,16 @@
 package container.restaurant.android.presentation.feed.category
 
 import androidx.lifecycle.*
-import com.tak8997.github.domain.ResultState
 import container.restaurant.android.data.FeedCategory
 import container.restaurant.android.data.SortingCategory
 import container.restaurant.android.data.repository.FeedExploreRepository
 import container.restaurant.android.data.response.FeedListResponse
-import container.restaurant.android.data.response.FeedResponse
+import container.restaurant.android.presentation.feed.item.FeedPreviewItem
 import container.restaurant.android.util.Event
 import container.restaurant.android.util.RecyclerViewItemClickListeners
 import container.restaurant.android.util.SingleLiveEvent
 import container.restaurant.android.util.handleApiResponse
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 internal class FeedCategoryViewModel(
@@ -21,12 +19,9 @@ internal class FeedCategoryViewModel(
 ) : ViewModel(),
     RecyclerViewItemClickListeners.ExploreFeedItemClickListener {
 
-    private val _feedList: MutableLiveData<List<FeedListResponse.FeedPreviewDtoList.FeedPreviewDto>> =
+    private val _feedList: MutableLiveData<List<FeedPreviewItem>> =
         MutableLiveData()
-    val feedList: LiveData<List<FeedListResponse.FeedPreviewDtoList.FeedPreviewDto>> = _feedList
-
-    private val _isExploreFeedItemClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
-    val isExploreFeedItemClicked: LiveData<Event<Boolean>> = _isExploreFeedItemClicked
+    val feedList: LiveData<List<FeedPreviewItem>> = _feedList
 
     var selectedFeedId: Int = -1
 
@@ -39,17 +34,34 @@ internal class FeedCategoryViewModel(
                 handleApiResponse(
                     response = response,
                     onSuccess = {
-                        _feedList.value = it.data?.embedded?.feedPreviewDtoList
+                        val tempFeedItemList = mutableListOf<FeedPreviewItem>()
+                            .apply {
+                                it.data?.embedded?.feedPreviewDtoList?.forEach { feedPreviewDto ->
+                                    add(FeedPreviewItem(feedPreviewDto, MutableLiveData(feedPreviewDto.isLike)))
+                                }
+                            }
+                        _feedList.value = tempFeedItemList
                         Timber.d("feedList.value = ${feedList.value}")
                     }
                 )
             }
     }
 
+
+    private val _isExploreFeedItemClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
+    val isExploreFeedItemClicked: LiveData<Event<Boolean>> = _isExploreFeedItemClicked
+
     override fun onExploreFeedItemClick(feedId: Int) {
         selectedFeedId = feedId
         Timber.d("onExploreFeedItemClick, selectedFeedId : $selectedFeedId")
         _isExploreFeedItemClicked.value = Event(true)
+    }
+
+    private val _isLikeFeedItemClicked = SingleLiveEvent<FeedPreviewItem>()
+    val isLikeFeedItemClicked: LiveData<FeedPreviewItem> = _isLikeFeedItemClicked
+
+    override fun onLikeFeedItemClick(feedPreviewItem: FeedPreviewItem) {
+        _isLikeFeedItemClicked.value = feedPreviewItem
     }
     /** 여기부터는 원래 있던 코드 **/
 //    private val feedResponse = MutableLiveData<FeedResponse>()

@@ -10,6 +10,7 @@ import container.restaurant.android.data.remote.FeedExploreService
 import container.restaurant.android.data.response.FeedResponse
 import container.restaurant.android.data.safeApiCall
 import container.restaurant.android.data.FeedCategory
+import container.restaurant.android.util.flowApiResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -60,4 +61,12 @@ class FeedExploreRepository(
                 emit(this)
             }
     }.flowOn(Dispatchers.IO)
+
+    @WorkerThread
+    suspend fun likeFeed(feedId: Int) =
+        flowApiResponse(feedExploreService.likeFeed(feedId))
+
+    @WorkerThread
+    suspend fun cancelLikeFeed(feedId: Int) =
+        flowApiResponse(feedExploreService.cancelLikeFeed(feedId))
 }

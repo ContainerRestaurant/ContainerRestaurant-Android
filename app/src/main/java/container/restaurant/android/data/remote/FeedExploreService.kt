@@ -3,9 +3,7 @@ package container.restaurant.android.data.remote
 import com.skydoves.sandwich.ApiResponse
 import container.restaurant.android.data.response.FeedListResponse
 import container.restaurant.android.data.response.FeedResponse
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface FeedExploreService {
 
@@ -30,4 +28,14 @@ interface FeedExploreService {
         @Query("page") page: Int,
         @Query("size") perPage: Int
     ): ApiResponse<FeedListResponse>
+
+    @POST("/api/like/feed/{feedId}")
+    suspend fun likeFeed(
+        @Path("feedId") feedId: Int
+    ): ApiResponse<Void>
+
+    @DELETE("/api/like/feed/{feedId}")
+    suspend fun cancelLikeFeed(
+        @Path("feedId") feedId: Int
+    ): ApiResponse<Void>
 }

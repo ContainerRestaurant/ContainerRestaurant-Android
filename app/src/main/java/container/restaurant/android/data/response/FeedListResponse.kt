@@ -12,6 +12,7 @@ data class FeedListResponse (
             @SerializedName("thumbnailUrl") val thumbnailUrl : String,
             @SerializedName("ownerNickname") val ownerNickname : String,
             @SerializedName("content") val content : String,
+            @SerializedName("isLike") val isLike: Boolean,
             @SerializedName("likeCount") val likeCount : Int,
             @SerializedName("replyCount") val replyCount : Int,
             @SerializedName("isContainerFriendly") val isContainerFriendly : Boolean

@@ -60,6 +60,15 @@ internal class FeedCategoryFragment : Fragment() {
                     startActivity(intent)
                 }
             })
+
+            isLikeFeedItemClicked.observe(viewLifecycleOwner) {
+                if(it.isLike.value == true) {
+                    it.isLike.value = false
+                }
+                else if(it.isLike.value == false) {
+                    it.isLike.value = true
+                }
+            }
         }
     }
 

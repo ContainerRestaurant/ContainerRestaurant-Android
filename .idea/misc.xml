@@ -5,11 +5,15 @@
       <map>
         <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/drawable/ic_home_lv1.xml" value="0.3764102564102564" />
         <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/drawable/ic_icon_chevron_right_filled_20_px.xml" value="0.3277777777777778" />
+        <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/drawable/ic_like_outline_12_px.xml" value="0.33796296296296297" />
+        <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/drawable/ic_like_outline_big.xml" value="0.3764102564102564" />
         <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/layout/activity_feed_all.xml" value="0.3432971014492754" />
+        <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/layout/activity_feed_detail.xml" value="0.17806484295845998" />
         <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/layout/activity_feed_write.xml" value="0.2703804347826087" />
         <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/layout/activity_main.xml" value="0.20885416666666667" />
         <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/layout/activity_sign_up.xml" value="0.254981884057971" />
         <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/layout/activity_user_profile.xml" value="0.2703804347826087" />
+        <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/layout/fragment_feed_category.xml" value="0.17806484295845998" />
         <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/layout/fragment_home.xml" value="0.2703804347826087" />
         <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/layout/fragment_kakao_signin.xml" value="0.254981884057971" />
         <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/layout/fragment_my.xml" value="0.17806484295845998" />
@@ -19,6 +23,7 @@
         <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/layout/fragment_privacy_policy.xml" value="0.2109375" />
         <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/layout/fragment_sign_up.xml" value="0.20833333333333334" />
         <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/layout/fragment_terms_of_service.xml" value="0.20833333333333334" />
+        <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/layout/item_explore_feed.xml" value="0.17806484295845998" />
         <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/layout/item_feed_user.xml" value="0.36614583333333334" />
         <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/layout/item_main_menu.xml" value="0.2703804347826087" />
         <entry key="..\:/Users/bs529/AndroidStudioProjects/ContainerRestaurant-Android/app/src/main/res/layout/item_most_feed_user.xml" value="0.36614583333333334" />

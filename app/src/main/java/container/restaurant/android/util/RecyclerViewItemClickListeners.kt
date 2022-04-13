@@ -2,6 +2,7 @@ package container.restaurant.android.util
 
 import container.restaurant.android.data.CategorySelection
 import container.restaurant.android.data.response.SearchLocationResponse
+import container.restaurant.android.presentation.feed.item.FeedPreviewItem
 
 interface RecyclerViewItemClickListeners {
     interface CategorySelectionItemClickListener {
@@ -18,5 +19,6 @@ interface RecyclerViewItemClickListeners {
     }
     interface ExploreFeedItemClickListener {
         fun onExploreFeedItemClick(feedId: Int)
+        fun onLikeFeedItemClick(feedPreviewItem: FeedPreviewItem)
     }
 }
