@@ -5,5 +5,6 @@ import container.restaurant.android.data.response.FeedListResponse
 
 data class FeedPreviewItem(
     val feedPreviewDto: FeedListResponse.FeedPreviewDtoList.FeedPreviewDto,
-    val isLike: MutableLiveData<Boolean>
+    val isLike: MutableLiveData<Boolean>,
+    val likeCnt: MutableLiveData<Int>
 )

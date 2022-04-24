@@ -96,7 +96,7 @@
                     android:id="@+id/tv_like_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{String.valueOf(item.feedPreviewDto.likeCount)}"
+                    android:text="@{String.valueOf(item.likeCnt)}"
                     android:textSize="12dp"
                     tools:ignore="SpUsage"
                     tools:text="99"

@@ -14,6 +14,7 @@ import container.restaurant.android.util.flowApiResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import retrofit2.http.Header
 
 private const val perPage = 20
 
@@ -48,8 +49,8 @@ class FeedExploreRepository(
     }
 
     @WorkerThread
-    suspend fun getFeedList(categoryName: String?, sortingCategory: SortingCategory, page: Int) = flow {
-        val response = feedExploreService.feedList(categoryName, sortingCategory.sort, page, perPage)
+    suspend fun getFeedList(tokenBearer: String, categoryName: String?, sortingCategory: SortingCategory, page: Int) = flow {
+        val response = feedExploreService.feedList(tokenBearer, categoryName, sortingCategory.sort, page, perPage)
         response
             .suspendOnSuccess {
                 emit(this)
@@ -63,10 +64,10 @@ class FeedExploreRepository(
     }.flowOn(Dispatchers.IO)
 
     @WorkerThread
-    suspend fun likeFeed(feedId: Int) =
-        flowApiResponse(feedExploreService.likeFeed(feedId))
+    suspend fun likeFeed(tokenBearer: String, feedId: Int) =
+        flowApiResponse(feedExploreService.likeFeed(tokenBearer, feedId))
 
     @WorkerThread
-    suspend fun cancelLikeFeed(feedId: Int) =
-        flowApiResponse(feedExploreService.cancelLikeFeed(feedId))
+    suspend fun cancelLikeFeed(tokenBearer: String, feedId: Int) =
+        flowApiResponse(feedExploreService.cancelLikeFeed(tokenBearer, feedId))
 }

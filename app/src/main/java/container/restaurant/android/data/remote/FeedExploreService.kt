@@ -23,6 +23,7 @@ interface FeedExploreService {
 
     @GET("api/feed")
     suspend fun feedList(
+        @Header("Authorization") tokenBearer: String,
         @Query("category") category: String? = null,
         @Query("sort") sort: String? = null,
         @Query("page") page: Int,
@@ -31,11 +32,13 @@ interface FeedExploreService {
 
     @POST("/api/like/feed/{feedId}")
     suspend fun likeFeed(
+        @Header("Authorization") tokenBearer: String,
         @Path("feedId") feedId: Int
     ): ApiResponse<Void>
 
     @DELETE("/api/like/feed/{feedId}")
     suspend fun cancelLikeFeed(
+        @Header("Authorization") tokenBearer: String,
         @Path("feedId") feedId: Int
     ): ApiResponse<Void>
 }

@@ -5,18 +5,16 @@ import container.restaurant.android.data.FeedCategory
 import container.restaurant.android.data.SortingCategory
 import container.restaurant.android.data.repository.FeedExploreRepository
 import container.restaurant.android.data.response.FeedListResponse
+import container.restaurant.android.presentation.base.BaseViewModel
 import container.restaurant.android.presentation.feed.item.FeedPreviewItem
-import container.restaurant.android.util.Event
-import container.restaurant.android.util.RecyclerViewItemClickListeners
-import container.restaurant.android.util.SingleLiveEvent
-import container.restaurant.android.util.handleApiResponse
+import container.restaurant.android.util.*
 import kotlinx.coroutines.flow.collect
 import timber.log.Timber
 
 internal class FeedCategoryViewModel(
     private val feedExploreRepository: FeedExploreRepository,
     private val feedCategory: FeedCategory
-) : ViewModel(),
+) : BaseViewModel(),
     RecyclerViewItemClickListeners.ExploreFeedItemClickListener {
 
     private val _feedList: MutableLiveData<List<FeedPreviewItem>> =
@@ -25,11 +23,11 @@ internal class FeedCategoryViewModel(
 
     var selectedFeedId: Int = -1
 
-    suspend fun getFeedList(sortingCategory: SortingCategory) {
+    suspend fun getFeedList(tokenBearer: String, sortingCategory: SortingCategory) {
         val categoryName =
             if (feedCategory.name == FeedCategory.ALL.name) null
             else feedCategory.name
-        feedExploreRepository.getFeedList(categoryName, sortingCategory, 0)
+        feedExploreRepository.getFeedList(tokenBearer, categoryName, sortingCategory, 0)
             .collect { response ->
                 handleApiResponse(
                     response = response,
@@ -37,11 +35,43 @@ internal class FeedCategoryViewModel(
                         val tempFeedItemList = mutableListOf<FeedPreviewItem>()
                             .apply {
                                 it.data?.embedded?.feedPreviewDtoList?.forEach { feedPreviewDto ->
-                                    add(FeedPreviewItem(feedPreviewDto, MutableLiveData(feedPreviewDto.isLike)))
+                                    add(FeedPreviewItem(feedPreviewDto, MutableLiveData(feedPreviewDto.isLike), MutableLiveData(feedPreviewDto.likeCount)))
                                 }
                             }
                         _feedList.value = tempFeedItemList
                         Timber.d("feedList.value = ${feedList.value}")
+                    }
+                )
+            }
+    }
+
+    suspend fun likeFeed(tokenBearer: String, feedId: Int, onLikeSuccess: () -> Unit, onLikeFail: () -> Unit) {
+        feedExploreRepository.likeFeed(tokenBearer, feedId)
+            .collect { response ->
+                handleApiResponse(
+                    response = response,
+                    onSuccess = {
+                        onLikeSuccess()
+                    }, onException = {
+                        onLikeFail()
+                    }, onError = {
+                        onLikeFail()
+                    }
+                )
+            }
+    }
+
+    suspend fun cancelLikeFeed(tokenBearer: String, feedId: Int, onCancelSuccess: () -> Unit, onCancelFail: () -> Unit) {
+        feedExploreRepository.cancelLikeFeed(tokenBearer, feedId)
+            .collect { response ->
+                handleApiResponse(
+                    response = response,
+                    onSuccess = {
+                        onCancelSuccess()
+                    }, onError = {
+                        onCancelFail()
+                    }, onException = {
+                        onCancelFail()
                     }
                 )
             }
