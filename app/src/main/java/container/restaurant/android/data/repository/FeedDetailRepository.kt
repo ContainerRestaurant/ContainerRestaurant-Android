@@ -37,4 +37,12 @@ class FeedDetailRepository(
     @WorkerThread
     suspend fun cancelLikeFeed(tokenBearer: String, feedId: Int) =
         flowApiResponse(feedExploreService.cancelLikeFeed(tokenBearer, feedId))
+
+    @WorkerThread
+    suspend fun scrapFeed(tokenBearer: String?, feedId: Int) =
+        flowApiResponse(feedDetailService.scrapFeed(tokenBearer, feedId))
+
+    @WorkerThread
+    suspend fun cancelScrapFeed(tokenBearer: String?, feedId: Int) =
+        flowApiResponse(feedDetailService.cancelScrapFeed(tokenBearer, feedId))
 }

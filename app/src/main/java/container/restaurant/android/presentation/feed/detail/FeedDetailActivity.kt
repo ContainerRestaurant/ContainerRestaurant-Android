@@ -70,7 +70,16 @@ class FeedDetailActivity : BaseActivity<ActivityFeedDetailBinding, FeedDetailVie
                 }
             }
             isScrapButtonClicked.observe(appCompatActivity) {
-
+                if(isScrapActivated.value == true) {
+                    isScrapActivated.value = false
+                    scrapCount.value = scrapCount.value?.minus(1)
+                    cancelScrapFeed(viewModel.feedId.value ?: 0, isScrapActivated, scrapCount)
+                }
+                else if(isScrapActivated.value == false) {
+                    isScrapActivated.value = true
+                    scrapCount.value = scrapCount.value?.plus(1)
+                    scrapFeed(viewModel.feedId.value ?: 0, isScrapActivated, scrapCount)
+                }
             }
         }
     }
@@ -134,7 +143,6 @@ class FeedDetailActivity : BaseActivity<ActivityFeedDetailBinding, FeedDetailVie
 
     }
 
-
     private fun likeFeed(feedId: Int, isLike: MutableLiveData<Boolean>, likeCnt: MutableLiveData<Int>) {
         lifecycleScope.launchWhenCreated {
             val tokenBearer = SharedPrefUtil.getString(appCompatActivity) { TOKEN_BEARER }
@@ -165,6 +173,41 @@ class FeedDetailActivity : BaseActivity<ActivityFeedDetailBinding, FeedDetailVie
                     toastShortOfFailMessage("피드 좋아요 취소")
                     isLike.value = true
                     likeCnt.value = likeCnt.value?.plus(1)
+                }
+            )
+        }
+    }
+
+    private fun scrapFeed(feedId: Int, isScrapped: MutableLiveData<Boolean>, scrapCnt: MutableLiveData<Int>) {
+        lifecycleScope.launchWhenCreated {
+            val tokenBearer = SharedPrefUtil.getString(appCompatActivity) { TOKEN_BEARER }
+            viewModel.scrapFeed(
+                tokenBearer,
+                feedId,
+                onLikeSuccess = {
+
+                }, onLikeFail = {
+                    toastShortOfFailMessage("피드 좋아요")
+                    isScrapped.value = false
+                    scrapCnt.value = scrapCnt.value?.minus(1)
+                }
+            )
+        }
+    }
+
+    private fun cancelScrapFeed(feedId: Int, isScrapped: MutableLiveData<Boolean>, scrapCnt: MutableLiveData<Int>) {
+        lifecycleScope.launchWhenCreated {
+            val tokenBearer = SharedPrefUtil.getString(appCompatActivity) { TOKEN_BEARER }
+            viewModel.cancelScrapFeed(
+                tokenBearer,
+                feedId,
+                onCancelSuccess = {
+
+                },
+                onCancelFail = {
+                    toastShortOfFailMessage("피드 좋아요 취소")
+                    isScrapped.value = true
+                    scrapCnt.value = scrapCnt.value?.plus(1)
                 }
             )
         }

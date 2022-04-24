@@ -27,8 +27,7 @@ class FeedDetailViewModel(private val feedDetailRepository: FeedDetailRepository
 
     val likeCount = MutableLiveData<Int>()
 
-    private val _scrapCount: MutableLiveData<Int> = MutableLiveData()
-    val scrapCount: LiveData<Int> = _scrapCount
+    val scrapCount = MutableLiveData<Int>()
 
     private val _thumbnailUrl: MutableLiveData<String> = MutableLiveData()
     val thumbnailUrl: LiveData<String> = _thumbnailUrl
@@ -71,7 +70,6 @@ class FeedDetailViewModel(private val feedDetailRepository: FeedDetailRepository
                         _ownerProfileUrl.value = it.data?.ownerProfile
                         _ownerNickname.value = it.data?.ownerNickname
                         _ownerContainerLevel.value = it.data?.ownerContainerLevel
-                        _scrapCount.value = it.data?.scrapCount
                         _thumbnailUrl.value = it.data?.thumbnailUrl
                         _content.value = it.data?.content
                         _restaurantName.value = it.data?.restaurantName
@@ -82,6 +80,8 @@ class FeedDetailViewModel(private val feedDetailRepository: FeedDetailRepository
                         _subMenuList.value = it.data?.subMenu
                         likeCount.value = it.data?.likeCount
                         isLikeActivated.value = it.data?.isLike
+                        scrapCount.value = it.data?.scrapCount
+                        isScrapActivated.value = it.data?.isScrapped
                         it.data?.category?.let{ categoryEn ->
                             _categoryStr.value = FeedCategory.valueOf(categoryEn).menuKorean
                         }
@@ -108,6 +108,38 @@ class FeedDetailViewModel(private val feedDetailRepository: FeedDetailRepository
 
     suspend fun cancelLikeFeed(tokenBearer: String, feedId: Int, onCancelSuccess: () -> Unit, onCancelFail: () -> Unit) {
         feedDetailRepository.cancelLikeFeed(tokenBearer, feedId)
+            .collect { response ->
+                handleApiResponse(
+                    response = response,
+                    onSuccess = {
+                        onCancelSuccess()
+                    }, onError = {
+                        onCancelFail()
+                    }, onException = {
+                        onCancelFail()
+                    }
+                )
+            }
+    }
+
+    suspend fun scrapFeed(tokenBearer: String, feedId: Int, onLikeSuccess: () -> Unit, onLikeFail: () -> Unit) {
+        feedDetailRepository.scrapFeed(tokenBearer, feedId)
+            .collect { response ->
+                handleApiResponse(
+                    response = response,
+                    onSuccess = {
+                        onLikeSuccess()
+                    }, onException = {
+                        onLikeFail()
+                    }, onError = {
+                        onLikeFail()
+                    }
+                )
+            }
+    }
+
+    suspend fun cancelScrapFeed(tokenBearer: String, feedId: Int, onCancelSuccess: () -> Unit, onCancelFail: () -> Unit) {
+        feedDetailRepository.cancelScrapFeed(tokenBearer, feedId)
             .collect { response ->
                 handleApiResponse(
                     response = response,
