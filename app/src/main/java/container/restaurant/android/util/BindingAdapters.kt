@@ -275,3 +275,10 @@ fun TextView.setDifficultyText(rating: Int) {
         else -> visibility = View.GONE
     }
 }
+
+@BindingAdapter("isActivated")
+fun View.setIsActivated(isActivated: Boolean?) {
+    isActivated?.let {
+        this.isActivated = it
+    }
+}

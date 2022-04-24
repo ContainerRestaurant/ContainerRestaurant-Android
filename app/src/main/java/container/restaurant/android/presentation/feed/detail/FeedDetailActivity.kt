@@ -7,6 +7,7 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -14,10 +15,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import container.restaurant.android.R
 import container.restaurant.android.databinding.ActivityFeedDetailBinding
 import container.restaurant.android.presentation.base.BaseActivity
-import container.restaurant.android.util.CommUtils
-import container.restaurant.android.util.DataTransfer
-import container.restaurant.android.util.EventObserver
-import container.restaurant.android.util.observe
+import container.restaurant.android.util.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class FeedDetailActivity : BaseActivity<ActivityFeedDetailBinding, FeedDetailViewModel>() {
@@ -33,8 +31,10 @@ class FeedDetailActivity : BaseActivity<ActivityFeedDetailBinding, FeedDetailVie
         viewDataBinding.viewModel = viewModel
 
         val feedId = intent.getIntExtra(DataTransfer.FEED_ID, -1)
+        viewModel.feedId.value = feedId
         lifecycleScope.launchWhenCreated {
-            viewModel.getFeedDetail(feedId)
+            val tokenBearer = SharedPrefUtil.getString(appCompatActivity) { TOKEN_BEARER }
+            viewModel.getFeedDetail(tokenBearer, feedId)
         }
 
         observeData()
@@ -57,6 +57,21 @@ class FeedDetailActivity : BaseActivity<ActivityFeedDetailBinding, FeedDetailVie
                     onBackPressed()
                 }
             })
+            isLikeButtonClicked.observe(appCompatActivity) {
+                if(isLikeActivated.value == true) {
+                    isLikeActivated.value = false
+                    likeCount.value = likeCount.value?.minus(1)
+                    cancelLikeFeed(viewModel.feedId.value ?: 0, isLikeActivated, likeCount)
+                }
+                else if(isLikeActivated.value == false) {
+                    isLikeActivated.value = true
+                    likeCount.value = likeCount.value?.plus(1)
+                    likeFeed(viewModel.feedId.value ?: 0, isLikeActivated, likeCount)
+                }
+            }
+            isScrapButtonClicked.observe(appCompatActivity) {
+
+            }
         }
     }
 
@@ -117,6 +132,42 @@ class FeedDetailActivity : BaseActivity<ActivityFeedDetailBinding, FeedDetailVie
             tab.text = tabText[pos]
         }.attach()
 
+    }
+
+
+    private fun likeFeed(feedId: Int, isLike: MutableLiveData<Boolean>, likeCnt: MutableLiveData<Int>) {
+        lifecycleScope.launchWhenCreated {
+            val tokenBearer = SharedPrefUtil.getString(appCompatActivity) { TOKEN_BEARER }
+            viewModel.likeFeed(
+                tokenBearer,
+                feedId,
+                onLikeSuccess = {
+
+                }, onLikeFail = {
+                    toastShortOfFailMessage("피드 좋아요")
+                    isLike.value = false
+                    likeCnt.value = likeCnt.value?.minus(1)
+                }
+            )
+        }
+    }
+
+    private fun cancelLikeFeed(feedId: Int, isLike: MutableLiveData<Boolean>, likeCnt: MutableLiveData<Int>) {
+        lifecycleScope.launchWhenCreated {
+            val tokenBearer = SharedPrefUtil.getString(appCompatActivity) { TOKEN_BEARER }
+            viewModel.cancelLikeFeed(
+                tokenBearer,
+                feedId,
+                onCancelSuccess = {
+
+                },
+                onCancelFail = {
+                    toastShortOfFailMessage("피드 좋아요 취소")
+                    isLike.value = true
+                    likeCnt.value = likeCnt.value?.plus(1)
+                }
+            )
+        }
     }
 
     companion object {

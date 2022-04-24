@@ -9,6 +9,7 @@ import container.restaurant.android.data.repository.FeedDetailRepository
 import container.restaurant.android.data.response.FeedDetailResponse
 import container.restaurant.android.presentation.base.BaseViewModel
 import container.restaurant.android.util.Event
+import container.restaurant.android.util.SingleLiveEvent
 import container.restaurant.android.util.handleApiResponse
 import kotlinx.coroutines.flow.collect
 import okhttp3.internal.notifyAll
@@ -16,14 +17,15 @@ import timber.log.Timber
 
 class FeedDetailViewModel(private val feedDetailRepository: FeedDetailRepository): BaseViewModel() {
 
+    val feedId = MutableLiveData<Int>()
+
     private val _ownerNickname: MutableLiveData<String> = MutableLiveData()
     val ownerNickname: LiveData<String> = _ownerNickname
 
     private val _ownerContainerLevel: MutableLiveData<String> = MutableLiveData()
     val ownerContainerLevel: LiveData<String> = _ownerContainerLevel
 
-    private val _likeCount: MutableLiveData<Int> = MutableLiveData()
-    val likeCount: LiveData<Int> = _likeCount
+    val likeCount = MutableLiveData<Int>()
 
     private val _scrapCount: MutableLiveData<Int> = MutableLiveData()
     val scrapCount: LiveData<Int> = _scrapCount
@@ -55,17 +57,13 @@ class FeedDetailViewModel(private val feedDetailRepository: FeedDetailRepository
     private val _subMenuList: MutableLiveData<List<FeedDetailResponse.Menu>> = MutableLiveData()
     val subMenuList: LiveData<List<FeedDetailResponse.Menu>> = _subMenuList
 
-    private val _isBackButtonClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
-    val isBackButtonClicked: LiveData<Event<Boolean>> = _isBackButtonClicked
-
     val ownerProfileRes = MutableLiveData<Int>()
 
-    fun onBackButtonClick() {
-        _isBackButtonClicked.value = Event(true)
-    }
+    val isLikeActivated = MutableLiveData<Boolean>()
+    val isScrapActivated = MutableLiveData<Boolean>()
 
-    suspend fun getFeedDetail(feedId: Int) {
-        feedDetailRepository.getFeedDetail(feedId)
+    suspend fun getFeedDetail(tokenBearer: String, feedId: Int) {
+        feedDetailRepository.getFeedDetail(tokenBearer, feedId)
             .collect { response ->
                 handleApiResponse(
                     response = response,
@@ -73,7 +71,6 @@ class FeedDetailViewModel(private val feedDetailRepository: FeedDetailRepository
                         _ownerProfileUrl.value = it.data?.ownerProfile
                         _ownerNickname.value = it.data?.ownerNickname
                         _ownerContainerLevel.value = it.data?.ownerContainerLevel
-                        _likeCount.value = it.data?.likeCount
                         _scrapCount.value = it.data?.scrapCount
                         _thumbnailUrl.value = it.data?.thumbnailUrl
                         _content.value = it.data?.content
@@ -83,11 +80,66 @@ class FeedDetailViewModel(private val feedDetailRepository: FeedDetailRepository
                         _difficulty.value = it.data?.difficulty
                         _mainMenuList.value = it.data?.mainMenu
                         _subMenuList.value = it.data?.subMenu
+                        likeCount.value = it.data?.likeCount
+                        isLikeActivated.value = it.data?.isLike
                         it.data?.category?.let{ categoryEn ->
                             _categoryStr.value = FeedCategory.valueOf(categoryEn).menuKorean
                         }
                     }
                 )
             }
+    }
+
+    suspend fun likeFeed(tokenBearer: String, feedId: Int, onLikeSuccess: () -> Unit, onLikeFail: () -> Unit) {
+        feedDetailRepository.likeFeed(tokenBearer, feedId)
+            .collect { response ->
+                handleApiResponse(
+                    response = response,
+                    onSuccess = {
+                        onLikeSuccess()
+                    }, onException = {
+                        onLikeFail()
+                    }, onError = {
+                        onLikeFail()
+                    }
+                )
+            }
+    }
+
+    suspend fun cancelLikeFeed(tokenBearer: String, feedId: Int, onCancelSuccess: () -> Unit, onCancelFail: () -> Unit) {
+        feedDetailRepository.cancelLikeFeed(tokenBearer, feedId)
+            .collect { response ->
+                handleApiResponse(
+                    response = response,
+                    onSuccess = {
+                        onCancelSuccess()
+                    }, onError = {
+                        onCancelFail()
+                    }, onException = {
+                        onCancelFail()
+                    }
+                )
+            }
+    }
+
+    private val _isLikeButtonClicked = SingleLiveEvent<Void>()
+    val isLikeButtonClicked: LiveData<Void> = _isLikeButtonClicked
+
+    fun onLikeButtonClick() {
+        _isLikeButtonClicked.call()
+    }
+
+    private val _isScrapButtonClicked = SingleLiveEvent<Void>()
+    val isScrapButtonClicked: LiveData<Void> = _isScrapButtonClicked
+
+    fun onScrapButtonClick() {
+        _isScrapButtonClicked.call()
+    }
+
+    private val _isBackButtonClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
+    val isBackButtonClicked: LiveData<Event<Boolean>> = _isBackButtonClicked
+
+    fun onBackButtonClick() {
+        _isBackButtonClicked.value = Event(true)
     }
 }

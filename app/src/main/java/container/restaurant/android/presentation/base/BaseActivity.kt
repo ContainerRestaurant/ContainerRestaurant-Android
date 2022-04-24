@@ -23,8 +23,11 @@ abstract class BaseActivity<T: ViewDataBinding, VM: BaseViewModel> : AppCompatAc
     abstract val layoutResId : Int
     abstract val viewModel : VM
 
+    lateinit var appCompatActivity: BaseActivity<T, VM>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        appCompatActivity = this@BaseActivity
         loadingDialog = ProgressDialog(this)
 
         viewDataBinding = DataBindingUtil.setContentView(this, layoutResId)
