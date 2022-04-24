@@ -9,28 +9,30 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.tabs.TabLayoutMediator
+import container.restaurant.android.R
 import container.restaurant.android.data.response.UserInfoResponse
 import container.restaurant.android.databinding.FragmentHomeBinding
 import container.restaurant.android.dialog.SimpleConfirmDialog
 import container.restaurant.android.presentation.auth.KakaoSignInDialogFragment
+import container.restaurant.android.presentation.base.BaseFragment
 import container.restaurant.android.presentation.feed.all.FeedAllActivity
+import container.restaurant.android.presentation.feed.detail.FeedDetailActivity
 import container.restaurant.android.presentation.feed.write.FeedWriteActivity
 import container.restaurant.android.presentation.home.item.BannerAdapter
 import container.restaurant.android.presentation.user.UserProfileActivity
 import container.restaurant.android.util.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-internal class HomeFragment : Fragment() {
-
+internal class HomeFragment : BaseFragment<FragmentHomeBinding, HomeViewModel>() {
+    override val layoutResId: Int = R.layout.fragment_home
     private val bannerAdapter by lazy {
         BannerAdapter()
     }
 
-    private val viewModel: HomeViewModel by viewModel()
-
-    private lateinit var binding: FragmentHomeBinding
+    override val viewModel: HomeViewModel by viewModel()
 
     // 가입 완료후 업데이트 할 정보
     private fun updateData() {
@@ -56,23 +58,9 @@ internal class HomeFragment : Fragment() {
             }
         }
 
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentHomeBinding.inflate(layoutInflater, container, false)
-            .apply {
-                lifecycleOwner = this@HomeFragment
-                viewModel = this@HomeFragment.viewModel
-            }
-        return binding.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        viewDataBinding.viewModel = viewModel
         observeData()
         setUpBannerView()
         getHomeInfo()
@@ -93,6 +81,26 @@ internal class HomeFragment : Fragment() {
                 }
                 setHomeIconByLevelTitle(requireContext(), homeIconResByUserLevel, userLevelTitle)
             }
+            isExploreFeedItemClicked.observe(viewLifecycleOwner) {
+                val intent = FeedDetailActivity.getIntent(requireActivity())
+                    .apply {
+                        putExtra(DataTransfer.FEED_ID, it)
+                    }
+                startActivity(intent)
+            }
+
+            isLikeFeedItemClicked.observe(viewLifecycleOwner) {
+                if(it.isLike.value == true) {
+                    it.isLike.value = false
+                    it.likeCnt.value = it.likeCnt.value?.minus(1)
+                    cancelLikeFeed(it.feedPreviewDto.id, it.isLike, it.likeCnt)
+                }
+                else if(it.isLike.value == false) {
+                    it.isLike.value = true
+                    it.likeCnt.value = it.likeCnt.value?.plus(1)
+                    likeFeed(it.feedPreviewDto.id, it.isLike, it.likeCnt)
+                }
+            }
         }
 
         observe(viewModel.bannerList) {
@@ -102,8 +110,6 @@ internal class HomeFragment : Fragment() {
         observe(viewModel.recommendedFeedList) {
 
         }
-
-
     }
 
     private fun addBannerItems() {
@@ -114,8 +120,8 @@ internal class HomeFragment : Fragment() {
     }
 
     private fun setUpBannerView() {
-        binding.pagerIntroBanner.adapter = bannerAdapter
-        TabLayoutMediator(binding.tablayoutIndicator, binding.pagerIntroBanner) { _, _ ->
+        viewDataBinding.pagerIntroBanner.adapter = bannerAdapter
+        TabLayoutMediator(viewDataBinding.tablayoutIndicator, viewDataBinding.pagerIntroBanner) { _, _ ->
         }.attach()
     }
 
@@ -128,7 +134,8 @@ internal class HomeFragment : Fragment() {
 
     private fun getRecommendedFeedList() {
         lifecycleScope.launchWhenCreated {
-            viewModel.getRecommendedFeedList()
+            val tokenBearer = SharedPrefUtil.getString(requireContext()) { TOKEN_BEARER }
+            viewModel.getRecommendedFeedList(tokenBearer)
         }
     }
 
@@ -207,6 +214,41 @@ internal class HomeFragment : Fragment() {
                     onInvalidToken = {}
                 )
             }
+        }
+    }
+
+    private fun likeFeed(feedId: Int, isLike: MutableLiveData<Boolean>, likeCnt: MutableLiveData<Int>) {
+        lifecycleScope.launchWhenCreated {
+            val tokenBearer = SharedPrefUtil.getString(requireContext()) { TOKEN_BEARER }
+            viewModel.likeFeed(
+                tokenBearer,
+                feedId,
+                onLikeSuccess = {
+
+                }, onLikeFail = {
+                    toastShortOfFailMessage("피드 좋아요")
+                    isLike.value = false
+                    likeCnt.value = likeCnt.value?.minus(1)
+                }
+            )
+        }
+    }
+
+    private fun cancelLikeFeed(feedId: Int, isLike: MutableLiveData<Boolean>, likeCnt: MutableLiveData<Int>) {
+        lifecycleScope.launchWhenCreated {
+            val tokenBearer = SharedPrefUtil.getString(requireContext()) { TOKEN_BEARER }
+            viewModel.cancelLikeFeed(
+                tokenBearer,
+                feedId,
+                onCancelSuccess = {
+
+                },
+                onCancelFail = {
+                    toastShortOfFailMessage("피드 좋아요 취소")
+                    isLike.value = true
+                    likeCnt.value = likeCnt.value?.plus(1)
+                }
+            )
         }
     }
 

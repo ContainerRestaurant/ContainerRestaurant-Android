@@ -2,7 +2,6 @@ package container.restaurant.android.presentation.home
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.skydoves.sandwich.StatusCode
 import container.restaurant.android.data.repository.AuthRepository
 import container.restaurant.android.data.repository.HomeRepository
@@ -10,7 +9,11 @@ import container.restaurant.android.data.response.FeedListResponse
 import container.restaurant.android.data.response.HomeInfoResponse
 import container.restaurant.android.data.response.ProfileResponse
 import container.restaurant.android.data.response.UserInfoResponse
+import container.restaurant.android.presentation.base.BaseViewModel
+import container.restaurant.android.presentation.feed.item.FeedPreviewItem
 import container.restaurant.android.util.Event
+import container.restaurant.android.util.RecyclerViewItemClickListeners
+import container.restaurant.android.util.SingleLiveEvent
 import container.restaurant.android.util.handleApiResponse
 import kotlinx.coroutines.flow.collect
 import timber.log.Timber
@@ -18,7 +21,8 @@ import timber.log.Timber
 internal class HomeViewModel(
     private val authRepository: AuthRepository,
     private val homeRepository: HomeRepository
-) : ViewModel() {
+) : BaseViewModel(),
+    RecyclerViewItemClickListeners.ExploreFeedItemClickListener {
 
     val navToAllContainerFeed = MutableLiveData<Event<Unit>>()
 
@@ -40,8 +44,8 @@ internal class HomeViewModel(
     private val _bannerList = MutableLiveData<List<HomeInfoResponse.Banner>>()
     val bannerList: LiveData<List<HomeInfoResponse.Banner>> = _bannerList
 
-    private val _recommendedFeedList = MutableLiveData<List<FeedListResponse.FeedPreviewDtoList.FeedPreviewDto>>()
-    val recommendedFeedList: LiveData<List<FeedListResponse.FeedPreviewDtoList.FeedPreviewDto>> = _recommendedFeedList
+    private val _recommendedFeedList = MutableLiveData<List<FeedPreviewItem>>()
+    val recommendedFeedList: LiveData<List<FeedPreviewItem>> = _recommendedFeedList
 
     private val _userFeedList = MutableLiveData<List<FeedListResponse.FeedPreviewDtoList.FeedPreviewDto>>()
     val userFeedList: LiveData<List<FeedListResponse.FeedPreviewDtoList.FeedPreviewDto>> = _userFeedList
@@ -114,13 +118,19 @@ internal class HomeViewModel(
             }
     }
 
-    suspend fun getRecommendedFeedList() {
-        homeRepository.getRecommendedFeedList()
+    suspend fun getRecommendedFeedList(tokenBearer: String?) {
+        homeRepository.getRecommendedFeedList(tokenBearer)
             .collect { response ->
                 handleApiResponse(
                     response = response,
                     onSuccess = {
-                        _recommendedFeedList.value = it.data?.embedded?.feedPreviewDtoList
+                        val tempFeedItemList = mutableListOf<FeedPreviewItem>()
+                            .apply {
+                                it.data?.embedded?.feedPreviewDtoList?.forEach { feedPreviewDto ->
+                                    add(FeedPreviewItem(feedPreviewDto, MutableLiveData(feedPreviewDto.isLike), MutableLiveData(feedPreviewDto.likeCount)))
+                                }
+                            }
+                        _recommendedFeedList.value = tempFeedItemList
                     },
                     onError = {
                         Timber.d("it.errorBody : ${it.errorBody}")
@@ -217,6 +227,52 @@ internal class HomeViewModel(
 //                    }
 //                )
 //            }
+    }
+
+    suspend fun likeFeed(tokenBearer: String, feedId: Int, onLikeSuccess: () -> Unit, onLikeFail: () -> Unit) {
+        homeRepository.likeFeed(tokenBearer, feedId)
+            .collect { response ->
+                handleApiResponse(
+                    response = response,
+                    onSuccess = {
+                        onLikeSuccess()
+                    }, onException = {
+                        onLikeFail()
+                    }, onError = {
+                        onLikeFail()
+                    }
+                )
+            }
+    }
+
+    suspend fun cancelLikeFeed(tokenBearer: String, feedId: Int, onCancelSuccess: () -> Unit, onCancelFail: () -> Unit) {
+        homeRepository.cancelLikeFeed(tokenBearer, feedId)
+            .collect { response ->
+                handleApiResponse(
+                    response = response,
+                    onSuccess = {
+                        onCancelSuccess()
+                    }, onError = {
+                        onCancelFail()
+                    }, onException = {
+                        onCancelFail()
+                    }
+                )
+            }
+    }
+
+    private val _isExploreFeedItemClicked = SingleLiveEvent<Int>()
+    val isExploreFeedItemClicked: LiveData<Int> = _isExploreFeedItemClicked
+
+    override fun onExploreFeedItemClick(feedId: Int) {
+        _isExploreFeedItemClicked.value = feedId
+    }
+
+    private val _isLikeFeedItemClicked = SingleLiveEvent<FeedPreviewItem>()
+    val isLikeFeedItemClicked: LiveData<FeedPreviewItem> = _isLikeFeedItemClicked
+
+    override fun onLikeFeedItemClick(feedPreviewItem: FeedPreviewItem) {
+        _isLikeFeedItemClicked.value = feedPreviewItem
     }
 
 }

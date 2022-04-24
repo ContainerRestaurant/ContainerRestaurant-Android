@@ -15,7 +15,7 @@ interface HomeService {
     suspend fun homeInfo(@Header("Authorization") tokenBearer: String) : ApiResponse<HomeInfoResponse>
 
     @GET("/api/feed/recommend")
-    suspend fun recommendedFeedList() : ApiResponse<FeedListResponse>
+    suspend fun recommendedFeedList(@Header("Authorization") tokenBearer: String?) : ApiResponse<FeedListResponse>
 
     @GET("/api/feed/user/{userId}")
     suspend fun userFeedList(
