@@ -14,8 +14,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MyScrapFragment : BaseFragment<FragmentMyScrapBinding, MyViewModel>() {
 
-    private lateinit var binding: FragmentMyScrapBinding
-
     override val layoutResId: Int = R.layout.fragment_my_scrap
     override val viewModel: MyViewModel by viewModel()
 

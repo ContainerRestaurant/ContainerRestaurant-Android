@@ -61,7 +61,7 @@ class MyViewModel(private val authRepository: AuthRepository, private val myRepo
     private val _myScrapFeedList =
         MutableLiveData<List<FeedListResponse.FeedPreviewDtoList.FeedPreviewDto>>()
     val myScrapFeedList: LiveData<List<FeedListResponse.FeedPreviewDtoList.FeedPreviewDto>> =
-        _myFeedList
+        _myScrapFeedList
 
 
     init {
