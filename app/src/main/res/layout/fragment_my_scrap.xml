@@ -68,14 +68,16 @@
             android:id="@+id/rv_my_feed"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="27dp"
+            android:layout_marginHorizontal="8dp"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/layout_top_navigation"
             app:spanCount="2"
-            bind:dino_itemLayout="@{@layout/item_my_scrap_feed}"
+            bind:dino_itemLayout="@{@layout/item_explore_feed}"
             bind:dino_items="@{viewModel.myScrapFeedList}"
             bind:dino_vm="@{viewModel}"
-            tools:listitem="@layout/item_my_scrap_feed"
+            tools:listitem="@layout/item_explore_feed"
             />
 
         <androidx.appcompat.widget.LinearLayoutCompat

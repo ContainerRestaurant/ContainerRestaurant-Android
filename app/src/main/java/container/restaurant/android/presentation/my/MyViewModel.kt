@@ -9,14 +9,18 @@ import container.restaurant.android.data.repository.MyRepository
 import container.restaurant.android.data.response.FeedListResponse
 import container.restaurant.android.data.response.UserInfoResponse
 import container.restaurant.android.presentation.base.BaseViewModel
+import container.restaurant.android.presentation.feed.item.FeedPreviewItem
 import container.restaurant.android.util.Event
+import container.restaurant.android.util.RecyclerViewItemClickListeners
+import container.restaurant.android.util.SingleLiveEvent
 import container.restaurant.android.util.handleApiResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import timber.log.Timber
 
 class MyViewModel(private val authRepository: AuthRepository, private val myRepository: MyRepository) :
-    BaseViewModel() {
+    BaseViewModel(),
+    RecyclerViewItemClickListeners.ExploreFeedItemClickListener {
     val getErrorMsg = MutableLiveData<String>()
     val viewLoading = MutableLiveData<Boolean>()
 
@@ -35,6 +39,8 @@ class MyViewModel(private val authRepository: AuthRepository, private val myRepo
     val userScrapCount = MutableLiveData<Int>()
     val userId = MutableLiveData<Int>()
     val userBookmarkedCount = MutableLiveData<Int>()
+
+    var selectedFeedId: Int = -1
 
     val userEmail = MutableLiveData<String>()
 
@@ -55,12 +61,12 @@ class MyViewModel(private val authRepository: AuthRepository, private val myRepo
     val onPrivacyPolicyLoad: MediatorLiveData<Boolean> = MediatorLiveData()
 
     private val _myFeedList =
-        MutableLiveData<List<FeedListResponse.FeedPreviewDtoList.FeedPreviewDto>>()
-    val myFeedList: LiveData<List<FeedListResponse.FeedPreviewDtoList.FeedPreviewDto>> = _myFeedList
+        MutableLiveData<List<FeedPreviewItem>>()
+    val myFeedList: LiveData<List<FeedPreviewItem>> = _myFeedList
 
-    private val _myScrapFeedList =
-        MutableLiveData<List<FeedListResponse.FeedPreviewDtoList.FeedPreviewDto>>()
-    val myScrapFeedList: LiveData<List<FeedListResponse.FeedPreviewDtoList.FeedPreviewDto>> =
+    private val _myScrapFeedList: MutableLiveData<List<FeedPreviewItem>> =
+        MutableLiveData()
+    val myScrapFeedList: LiveData<List<FeedPreviewItem>> =
         _myScrapFeedList
 
 
@@ -215,7 +221,12 @@ class MyViewModel(private val authRepository: AuthRepository, private val myRepo
                 handleApiResponse(
                     response = response,
                     onSuccess = {
-                        _myFeedList.value = it.data?.embedded?.feedPreviewDtoList
+                        val tempList = mutableListOf<FeedPreviewItem>().apply {
+                            it.data?.embedded?.feedPreviewDtoList?.forEach { feedPreviewDto ->
+                                add(FeedPreviewItem(feedPreviewDto, MutableLiveData(feedPreviewDto.isLike), MutableLiveData(feedPreviewDto.likeCount)))
+                            }
+                        }
+                        _myFeedList.value = tempList
                     },
                     onError = {
                         Timber.d("it.errorBody : ${it.errorBody}")
@@ -238,7 +249,12 @@ class MyViewModel(private val authRepository: AuthRepository, private val myRepo
                 handleApiResponse(
                     response = response,
                     onSuccess = {
-                        _myScrapFeedList.value = it.data?.embedded?.feedPreviewDtoList
+                        val tempList = mutableListOf<FeedPreviewItem>().apply {
+                            it.data?.embedded?.feedPreviewDtoList?.forEach { feedPreviewDto ->
+                                add(FeedPreviewItem(feedPreviewDto, MutableLiveData(feedPreviewDto.isLike), MutableLiveData(feedPreviewDto.likeCount)))
+                            }
+                        }
+                        _myScrapFeedList.value = tempList
                     },
                     onError = {
                         Timber.d("it.errorBody : ${it.errorBody}")
@@ -255,85 +271,134 @@ class MyViewModel(private val authRepository: AuthRepository, private val myRepo
             }
     }
 
+
+    suspend fun likeFeed(tokenBearer: String, feedId: Int, onLikeSuccess: () -> Unit, onLikeFail: () -> Unit) {
+        myRepository.likeFeed(tokenBearer, feedId)
+            .collect { response ->
+                handleApiResponse(
+                    response = response,
+                    onSuccess = {
+                        onLikeSuccess()
+                    }, onException = {
+                        onLikeFail()
+                    }, onError = {
+                        onLikeFail()
+                    }
+                )
+            }
+    }
+
+    suspend fun cancelLikeFeed(tokenBearer: String, feedId: Int, onCancelSuccess: () -> Unit, onCancelFail: () -> Unit) {
+        myRepository.cancelLikeFeed(tokenBearer, feedId)
+            .collect { response ->
+                handleApiResponse(
+                    response = response,
+                    onSuccess = {
+                        onCancelSuccess()
+                    }, onError = {
+                        onCancelFail()
+                    }, onException = {
+                        onCancelFail()
+                    }
+                )
+            }
+    }
+
     /** 클릭 이벤트 **/
     private val _isSettingButtonClicked = MutableLiveData<Event<Boolean>>()
     val isSettingButtonClicked: LiveData<Event<Boolean>> = _isSettingButtonClicked
-
-    private val _isMyFeedButtonClicked = MutableLiveData<Event<Boolean>>()
-    val isMyFeedButtonClicked: LiveData<Event<Boolean>> = _isMyFeedButtonClicked
-
-    private val _isScrapFeedButtonClicked = MutableLiveData<Event<Boolean>>()
-    val isScrapFeedButtonClicked: LiveData<Event<Boolean>> = _isScrapFeedButtonClicked
-
-    private val _isBookmarkedRestaurantButtonClicked = MutableLiveData<Event<Boolean>>()
-    val isBookmarkedRestaurantButtonClicked: LiveData<Event<Boolean>> =
-        _isBookmarkedRestaurantButtonClicked
-
-    private val _isNicknameChangeButtonClicked = MutableLiveData<Event<Boolean>>()
-    val isNicknameChangeButtonClicked: LiveData<Event<Boolean>> = _isNicknameChangeButtonClicked
-
-    private val _isBackButtonClicked = MutableLiveData<Event<Boolean>>()
-    val isBackButtonClicked: LiveData<Event<Boolean>> = _isBackButtonClicked
-
-    private val _isPrivacyPolicyButtonClicked = MutableLiveData<Event<Boolean>>()
-    val isPrivacyPolicyButtonClicked: LiveData<Event<Boolean>> = _isPrivacyPolicyButtonClicked
-
-    private val _isTermsOfServiceButtonClicked = MutableLiveData<Event<Boolean>>()
-    val isTermsOfPolicyButtonClicked: LiveData<Event<Boolean>> = _isTermsOfServiceButtonClicked
-
-    private val _isSignOutButtonClicked = MutableLiveData<Event<Boolean>>()
-    val isSignOutButtonClicked: LiveData<Event<Boolean>> = _isSignOutButtonClicked
-
-    private val _isWithdrawalButtonClicked = MutableLiveData<Event<Boolean>>()
-    val isWithdrawalButtonClicked: LiveData<Event<Boolean>> = _isWithdrawalButtonClicked
 
     fun onSettingButtonClick() {
         _isSettingButtonClicked.value = Event(true)
         _isSettingButtonClicked.value = Event(false)
     }
 
+    private val _isMyFeedButtonClicked = MutableLiveData<Event<Boolean>>()
+    val isMyFeedButtonClicked: LiveData<Event<Boolean>> = _isMyFeedButtonClicked
+
     fun onMyFeedButtonClick() {
         _isMyFeedButtonClicked.value = Event(true)
         _isMyFeedButtonClicked.value = Event(false)
     }
+
+    private val _isScrapFeedButtonClicked = MutableLiveData<Event<Boolean>>()
+    val isScrapFeedButtonClicked: LiveData<Event<Boolean>> = _isScrapFeedButtonClicked
 
     fun onScrapFeedButtonClick() {
         _isScrapFeedButtonClicked.value = Event(true)
         _isScrapFeedButtonClicked.value = Event(false)
     }
 
-    fun onSignOutButtonClick() {
-        _isSignOutButtonClicked.value = Event(true)
-        _isSignOutButtonClicked.value = Event(false)
-    }
-
-    fun onWithdrawalButtonClick() {
-        _isWithdrawalButtonClicked.value = Event(true)
-        _isWithdrawalButtonClicked.value = Event(false)
-    }
+    private val _isBookmarkedRestaurantButtonClicked = MutableLiveData<Event<Boolean>>()
+    val isBookmarkedRestaurantButtonClicked: LiveData<Event<Boolean>> =
+        _isBookmarkedRestaurantButtonClicked
 
     fun onBookmarkedRestaurantButtonClick() {
         _isBookmarkedRestaurantButtonClicked.value = Event(true)
         _isBookmarkedRestaurantButtonClicked.value = Event(false)
     }
 
+    private val _isNicknameChangeButtonClicked = MutableLiveData<Event<Boolean>>()
+    val isNicknameChangeButtonClicked: LiveData<Event<Boolean>> = _isNicknameChangeButtonClicked
+
     fun onNicknameChangeButtonClick() {
         _isNicknameChangeButtonClicked.value = Event(true)
         _isNicknameChangeButtonClicked.value = Event(false)
     }
 
+    private val _isBackButtonClicked = MutableLiveData<Event<Boolean>>()
+    val isBackButtonClicked: LiveData<Event<Boolean>> = _isBackButtonClicked
+
     fun onBackButtonClick() {
         _isBackButtonClicked.value = Event(true)
     }
+
+    private val _isPrivacyPolicyButtonClicked = MutableLiveData<Event<Boolean>>()
+    val isPrivacyPolicyButtonClicked: LiveData<Event<Boolean>> = _isPrivacyPolicyButtonClicked
 
     fun onPrivacyPolicyButtonClick() {
         _isPrivacyPolicyButtonClicked.value = Event(true)
         _isPrivacyPolicyButtonClicked.value = Event(false)
     }
 
+    private val _isTermsOfServiceButtonClicked = MutableLiveData<Event<Boolean>>()
+    val isTermsOfPolicyButtonClicked: LiveData<Event<Boolean>> = _isTermsOfServiceButtonClicked
+
     fun onTermsOfServiceButtonClick() {
         _isTermsOfServiceButtonClicked.value = Event(true)
         _isTermsOfServiceButtonClicked.value = Event(false)
+    }
+
+    private val _isSignOutButtonClicked = MutableLiveData<Event<Boolean>>()
+    val isSignOutButtonClicked: LiveData<Event<Boolean>> = _isSignOutButtonClicked
+
+    fun onSignOutButtonClick() {
+        _isSignOutButtonClicked.value = Event(true)
+        _isSignOutButtonClicked.value = Event(false)
+    }
+
+    private val _isWithdrawalButtonClicked = MutableLiveData<Event<Boolean>>()
+    val isWithdrawalButtonClicked: LiveData<Event<Boolean>> = _isWithdrawalButtonClicked
+
+    fun onWithdrawalButtonClick() {
+        _isWithdrawalButtonClicked.value = Event(true)
+        _isWithdrawalButtonClicked.value = Event(false)
+    }
+
+    private val _isExploreFeedItemClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
+    val isExploreFeedItemClicked: LiveData<Event<Boolean>> = _isExploreFeedItemClicked
+
+    override fun onExploreFeedItemClick(feedId: Int) {
+        selectedFeedId = feedId
+        Timber.d("onExploreFeedItemClick, selectedFeedId : $selectedFeedId")
+        _isExploreFeedItemClicked.value = Event(true)
+    }
+
+    private val _isLikeFeedItemClicked = SingleLiveEvent<FeedPreviewItem>()
+    val isLikeFeedItemClicked: LiveData<FeedPreviewItem> = _isLikeFeedItemClicked
+
+    override fun onLikeFeedItemClick(feedPreviewItem: FeedPreviewItem) {
+        _isLikeFeedItemClicked.value = feedPreviewItem
     }
 
 }

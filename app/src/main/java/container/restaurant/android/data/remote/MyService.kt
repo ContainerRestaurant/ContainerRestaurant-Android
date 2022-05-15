@@ -57,4 +57,16 @@ interface MyService {
 
     @GET("/api/favorite/restaurant")
     suspend fun favoriteRestaurant()
+
+    @POST("/api/like/feed/{feedId}")
+    suspend fun likeFeed(
+        @Header("Authorization") tokenBearer: String,
+        @Path("feedId") feedId: Int
+    ): ApiResponse<Void>
+
+    @DELETE("/api/like/feed/{feedId}")
+    suspend fun cancelLikeFeed(
+        @Header("Authorization") tokenBearer: String,
+        @Path("feedId") feedId: Int
+    ): ApiResponse<Void>
 }

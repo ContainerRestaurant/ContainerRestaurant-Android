@@ -3,6 +3,7 @@ package container.restaurant.android.data.repository
 import androidx.annotation.WorkerThread
 import com.skydoves.sandwich.*
 import container.restaurant.android.data.remote.MyService
+import container.restaurant.android.util.flowApiResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -68,6 +69,14 @@ class MyRepository(private val myService: MyService) {
                 emit(this)
             }
     }.flowOn(Dispatchers.IO)
+
+    @WorkerThread
+    suspend fun likeFeed(tokenBearer: String, feedId: Int) =
+        flowApiResponse(myService.likeFeed(tokenBearer, feedId))
+
+    @WorkerThread
+    suspend fun cancelLikeFeed(tokenBearer: String, feedId: Int) =
+        flowApiResponse(myService.cancelLikeFeed(tokenBearer, feedId))
 
 //    @WorkerThread
 //    fun tempLogin(onStart: () -> Unit, onComplete: () -> Unit, onError:(String?) -> Unit) = flow {
