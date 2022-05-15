@@ -10,6 +10,7 @@ import androidx.navigation.fragment.navArgs
 import container.restaurant.android.R
 import container.restaurant.android.databinding.FragmentMyFeedBinding
 import container.restaurant.android.presentation.base.BaseFragment
+import container.restaurant.android.util.SharedPrefUtil
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MyFeedFragment : BaseFragment<FragmentMyFeedBinding, MyViewModel>() {
@@ -36,7 +37,9 @@ class MyFeedFragment : BaseFragment<FragmentMyFeedBinding, MyViewModel>() {
 
     private fun getMyFeedList() {
         lifecycleScope.launchWhenCreated {
-            viewModel.getMyFeedList()
+            val tokenBearer = SharedPrefUtil.getString(requireContext()) { TOKEN_BEARER }
+            val userId = SharedPrefUtil.getInt(requireContext()) { USER_ID }
+            viewModel.getMyFeedList(tokenBearer, userId)
         }
     }
 }

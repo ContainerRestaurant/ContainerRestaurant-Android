@@ -209,50 +209,50 @@ class MyViewModel(private val authRepository: AuthRepository, private val myRepo
             }
     }
 
-    suspend fun getMyFeedList() {
-//        myRepository.getMyFeed(prefStorage.token)
-//            .collect { response ->
-//                handleApiResponse(
-//                    response = response,
-//                    onSuccess = {
-//                        _myFeedList.value = it.data?.embedded?.feedPreviewDtoList
-//                    },
-//                    onError = {
-//                        Timber.d("it.errorBody : ${it.errorBody}")
-//                        Timber.d("it.headers : ${it.headers}")
-//                        Timber.d("it.raw : ${it.raw}")
-//                        Timber.d("it.response : ${it.response}")
-//                        Timber.d("it.statusCode : ${it.statusCode}")
-//                    },
-//                    onException = {
-//                        Timber.d("it.message : ${it.message}")
-//                        Timber.d("it.exception : ${it.exception}")
-//                    }
-//                )
-//            }
+    suspend fun getMyFeedList(tokenBearer: String, userId: Int) {
+        myRepository.getMyFeed(tokenBearer, userId)
+            .collect { response ->
+                handleApiResponse(
+                    response = response,
+                    onSuccess = {
+                        _myFeedList.value = it.data?.embedded?.feedPreviewDtoList
+                    },
+                    onError = {
+                        Timber.d("it.errorBody : ${it.errorBody}")
+                        Timber.d("it.headers : ${it.headers}")
+                        Timber.d("it.raw : ${it.raw}")
+                        Timber.d("it.response : ${it.response}")
+                        Timber.d("it.statusCode : ${it.statusCode}")
+                    },
+                    onException = {
+                        Timber.d("it.message : ${it.message}")
+                        Timber.d("it.exception : ${it.exception}")
+                    }
+                )
+            }
     }
 
-    suspend fun getMyScrapFeedList() {
-//        myRepository.getMyScrapFeed(prefStorage.token)
-//            .collect { response ->
-//                handleApiResponse(
-//                    response = response,
-//                    onSuccess = {
-//                        _myScrapFeedList.value = it.data?.embedded?.feedPreviewDtoList
-//                    },
-//                    onError = {
-//                        Timber.d("it.errorBody : ${it.errorBody}")
-//                        Timber.d("it.headers : ${it.headers}")
-//                        Timber.d("it.raw : ${it.raw}")
-//                        Timber.d("it.response : ${it.response}")
-//                        Timber.d("it.statusCode : ${it.statusCode}")
-//                    },
-//                    onException = {
-//                        Timber.d("it.message : ${it.message}")
-//                        Timber.d("it.exception : ${it.exception}")
-//                    }
-//                )
-//            }
+    suspend fun getMyScrapFeedList(tokenBearer: String, userId: Int) {
+        myRepository.getMyScrapFeed(tokenBearer, userId)
+            .collect { response ->
+                handleApiResponse(
+                    response = response,
+                    onSuccess = {
+                        _myScrapFeedList.value = it.data?.embedded?.feedPreviewDtoList
+                    },
+                    onError = {
+                        Timber.d("it.errorBody : ${it.errorBody}")
+                        Timber.d("it.headers : ${it.headers}")
+                        Timber.d("it.raw : ${it.raw}")
+                        Timber.d("it.response : ${it.response}")
+                        Timber.d("it.statusCode : ${it.statusCode}")
+                    },
+                    onException = {
+                        Timber.d("it.message : ${it.message}")
+                        Timber.d("it.exception : ${it.exception}")
+                    }
+                )
+            }
     }
 
     /** 클릭 이벤트 **/

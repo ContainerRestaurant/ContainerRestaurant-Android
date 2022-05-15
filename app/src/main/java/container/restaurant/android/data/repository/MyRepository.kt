@@ -40,8 +40,8 @@ class MyRepository(private val myService: MyService) {
     }.flowOn(Dispatchers.IO)
 
     @WorkerThread
-    suspend fun getMyFeed(userId: Int) = flow {
-        val response = myService.myFeed(userId)
+    suspend fun getMyFeed(tokenBearer: String, userId: Int) = flow {
+        val response = myService.myFeed(tokenBearer, userId)
         response
             .suspendOnSuccess {
                 emit(this)
@@ -55,8 +55,8 @@ class MyRepository(private val myService: MyService) {
     }.flowOn(Dispatchers.IO)
 
     @WorkerThread
-    suspend fun getMyScrapFeed(userId: Int) = flow {
-        val response = myService.myScrapFeed(userId)
+    suspend fun getMyScrapFeed(tokenBearer: String, userId: Int) = flow {
+        val response = myService.myScrapFeed(tokenBearer, userId)
         response
             .suspendOnSuccess {
                 emit(this)

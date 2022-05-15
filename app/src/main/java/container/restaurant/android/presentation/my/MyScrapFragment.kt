@@ -10,6 +10,7 @@ import androidx.navigation.fragment.navArgs
 import container.restaurant.android.R
 import container.restaurant.android.databinding.FragmentMyScrapBinding
 import container.restaurant.android.presentation.base.BaseFragment
+import container.restaurant.android.util.SharedPrefUtil
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MyScrapFragment : BaseFragment<FragmentMyScrapBinding, MyViewModel>() {
@@ -36,7 +37,9 @@ class MyScrapFragment : BaseFragment<FragmentMyScrapBinding, MyViewModel>() {
 
     private fun getMyScrapFeedList(){
         lifecycleScope.launchWhenCreated {
-            viewModel.getMyScrapFeedList()
+            val tokenBearer = SharedPrefUtil.getString(requireContext()) { TOKEN_BEARER }
+            val userId = SharedPrefUtil.getInt(requireContext()) { USER_ID }
+            viewModel.getMyScrapFeedList(tokenBearer, userId)
         }
     }
 }

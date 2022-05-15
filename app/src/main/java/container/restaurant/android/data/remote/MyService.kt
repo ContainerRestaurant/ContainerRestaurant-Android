@@ -50,10 +50,10 @@ interface MyService {
     suspend fun contract() : ApiResponse<ContractResponse>
 
     @GET("/api/feed/user/{userId}")
-    suspend fun myFeed(@Path("userId")userId: Int) :ApiResponse<FeedListResponse>
+    suspend fun myFeed(@Header("Authorization") tokenBearer: String, @Path("userId")userId: Int) :ApiResponse<FeedListResponse>
 
     @GET("/api/feed/user/{userId}/scrap")
-    suspend fun myScrapFeed(@Path("userId")userId:Int): ApiResponse<FeedListResponse>
+    suspend fun myScrapFeed(@Header("Authorization") tokenBearer: String, @Path("userId")userId:Int): ApiResponse<FeedListResponse>
 
     @GET("/api/favorite/restaurant")
     suspend fun favoriteRestaurant()
