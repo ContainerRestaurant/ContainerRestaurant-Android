@@ -22,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_community_detail_comment"
+            android:id="@+id/cl_feed_detail_comment"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:paddingVertical="8dp"
@@ -31,19 +31,20 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent">
             <androidx.cardview.widget.CardView
-                android:id="@+id/card_view_community_detail_comment_user_icon"
+                android:id="@+id/card_view_feed_detail_comment_user_icon"
                 android:layout_width="@dimen/comment_user_icon_size"
                 android:layout_height="@dimen/comment_user_icon_size"
                 app:cardCornerRadius="@dimen/comment_user_icon_half_size"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@id/tv_user_nickname"
-                app:layout_constraintBottom_toBottomOf="@id/tv_community_detail_comment_date"
+                app:layout_constraintBottom_toBottomOf="@id/tv_feed_detail_comment_date"
                 app:cardBackgroundColor="@android:color/transparent"
                 app:cardElevation="0dp">
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    bind:imageUrl="@{item.commentReply.ownerProfileUrl}"
+                    bind:profileUrl="@{item.commentReply.ownerProfileUrl}"
+                    bind:levelTitle="@{item.commentReply.ownerLevelTitle}"
                     android:scaleType="centerCrop"
                     android:contentDescription="@string/user_icon"
                     tools:src="@drawable/empty_profile_lv1"/>
@@ -59,10 +60,10 @@
                 android:textColor="@color/gray_07"
                 android:textAppearance="@style/TextAppearance.App.Caption2"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toEndOf="@id/card_view_community_detail_comment_user_icon"
-                app:layout_constraintBottom_toTopOf="@id/tv_community_detail_comment_date"/>
+                app:layout_constraintStart_toEndOf="@id/card_view_feed_detail_comment_user_icon"
+                app:layout_constraintBottom_toTopOf="@id/tv_feed_detail_comment_date"/>
             <TextView
-                android:id="@+id/tv_community_detail_comment_content"
+                android:id="@+id/tv_feed_detail_comment_content"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 tools:text="용기낸 식당 컨텐츠 보고 저도 용기를 내봤습니다! 너무 좋은 시도인 것 같아요! 용기낸 식당 컨텐츠 보고 저도 용기를 내봤습니다! 너무 좋은 시도인 것 같아요! "
@@ -70,11 +71,11 @@
                 android:textAppearance="@style/TextAppearance.App.Caption1"
                 android:textColor="@color/gray_07"
                 android:layout_marginTop="8dp"
-                app:layout_constraintTop_toBottomOf="@id/tv_community_detail_comment_date"
+                app:layout_constraintTop_toBottomOf="@id/tv_feed_detail_comment_date"
                 app:layout_constraintStart_toStartOf="@id/tv_user_nickname"
                 app:layout_constraintEnd_toEndOf="parent"/>
             <TextView
-                android:id="@+id/tv_community_detail_comment_date"
+                android:id="@+id/tv_feed_detail_comment_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{item.commentReply.ownerLevelTitle}"
@@ -83,24 +84,24 @@
                 tools:text="LV1. 텀블러"
                 android:textColor="@color/green_02"
                 android:textAppearance="@style/TextAppearance.App.Caption3"
-                app:layout_constraintBottom_toBottomOf="@id/card_view_community_detail_comment_user_icon"/>
+                app:layout_constraintBottom_toBottomOf="@id/card_view_feed_detail_comment_user_icon"/>
             <ImageView
-                android:id="@+id/iv_community_detail_comment_see_more"
+                android:id="@+id/iv_feed_detail_comment_see_more"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_more"
                 android:onClick="@{()->eventHolder.onCommentShowMoreClick(item)}"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/card_view_community_detail_comment_user_icon"
-                app:layout_constraintBottom_toBottomOf="@id/card_view_community_detail_comment_user_icon"
+                app:layout_constraintTop_toTopOf="@id/card_view_feed_detail_comment_user_icon"
+                app:layout_constraintBottom_toBottomOf="@id/card_view_feed_detail_comment_user_icon"
                 android:paddingVertical="10dp"
                 android:contentDescription="@string/show_more" />
         </androidx.constraintlayout.widget.ConstraintLayout>
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_community_detail_reply"
+            android:id="@+id/rv_feed_detail_reply"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/cl_community_detail_comment"
+            app:layout_constraintTop_toBottomOf="@id/cl_feed_detail_comment"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             bind:dino_items="@{item.commentReply.replyList}"
             bind:dino_itemLayout="@{@layout/item_reply}"

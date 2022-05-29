@@ -7,12 +7,18 @@ import container.restaurant.android.data.repository.FeedDetailRepository
 import container.restaurant.android.data.response.FeedDetailResponse
 import container.restaurant.android.presentation.base.BaseViewModel
 import container.restaurant.android.presentation.feed.item.CommentReplyItem
+import container.restaurant.android.presentation.feed.item.ReplyItem
 import container.restaurant.android.util.Event
+import container.restaurant.android.util.RecyclerViewItemClickListeners
 import container.restaurant.android.util.SingleLiveEvent
 import container.restaurant.android.util.handleApiResponse
 import kotlinx.coroutines.flow.collect
 
-class FeedDetailViewModel(private val feedDetailRepository: FeedDetailRepository): BaseViewModel() {
+class FeedDetailViewModel(
+    private val feedDetailRepository: FeedDetailRepository
+): BaseViewModel()
+    , RecyclerViewItemClickListeners.CommentReplyItemClickListener
+    , RecyclerViewItemClickListeners.ReplyItemClickListener{
 
     val feedId = MutableLiveData<Int>()
 
@@ -172,6 +178,14 @@ class FeedDetailViewModel(private val feedDetailRepository: FeedDetailRepository
                     }
                 )
             }
+    }
+
+    override fun onCommentShowMoreClick(item: CommentReplyItem) {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onReplyShowMoreClick(item: ReplyItem) {
+        //TODO("Not yet implemented")
     }
 
     private val _isLikeButtonClicked = SingleLiveEvent<Void>()

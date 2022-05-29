@@ -42,7 +42,8 @@
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    bind:imageUrl="@{item.reply.ownerProfileUrl}"
+                    bind:profileUrl="@{item.reply.ownerProfileUrl}"
+                    bind:levelTitle="@{item.reply.ownerLevelTitle}"
                     android:scaleType="centerCrop"
                     android:contentDescription="@string/user_icon"
                     tools:src="@drawable/empty_profile_lv1"/>

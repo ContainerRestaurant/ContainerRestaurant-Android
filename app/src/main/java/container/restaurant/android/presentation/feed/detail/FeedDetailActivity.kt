@@ -7,10 +7,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.dino.library.dinorecyclerview.DinoAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import container.restaurant.android.R
 import container.restaurant.android.databinding.ActivityFeedDetailBinding
 import container.restaurant.android.presentation.base.BaseActivity
+import container.restaurant.android.presentation.feed.item.FeedCommentAdapter
 import container.restaurant.android.util.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -34,6 +36,7 @@ class FeedDetailActivity : BaseActivity<ActivityFeedDetailBinding, FeedDetailVie
         initFeedId()
         getFeedDetail()
         getFeedCommentReply()
+        initCommentRecyclerView()
     }
 
     private fun initFeedId() {
@@ -60,6 +63,11 @@ class FeedDetailActivity : BaseActivity<ActivityFeedDetailBinding, FeedDetailVie
                 onGetFail = {}
             )
         }
+    }
+
+    private fun initCommentRecyclerView() {
+        viewDataBinding.rvFeedDetailComment.adapter = FeedCommentAdapter(viewModel, viewModel.commentReplyItemList)
+        (viewDataBinding.rvFeedDetailComment.adapter as? DinoAdapter)?.eventHolder = viewModel
     }
 
     private fun observeData() {
