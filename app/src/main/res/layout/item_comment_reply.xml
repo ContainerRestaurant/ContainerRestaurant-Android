@@ -25,7 +25,7 @@
             android:id="@+id/cl_feed_detail_comment"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:paddingVertical="8dp"
+            android:paddingVertical="20dp"
             android:layout_marginHorizontal="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
