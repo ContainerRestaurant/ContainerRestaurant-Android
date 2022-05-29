@@ -45,4 +45,8 @@ class FeedDetailRepository(
     @WorkerThread
     suspend fun cancelScrapFeed(tokenBearer: String?, feedId: Int) =
         flowApiResponse(feedDetailService.cancelScrapFeed(tokenBearer, feedId))
+
+    @WorkerThread
+    suspend fun getFeedCommentReply(tokenBearer: String, feedId: Int) =
+        flowApiResponse(feedDetailService.getFeedCommentReply(tokenBearer, feedId))
 }

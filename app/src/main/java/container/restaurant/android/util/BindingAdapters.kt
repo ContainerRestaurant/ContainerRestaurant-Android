@@ -23,7 +23,7 @@ import de.hdodenhof.circleimageview.CircleImageView
 import timber.log.Timber
 import java.util.*
 
-@BindingAdapter(value = ["android:imageUrl", "android:circleCrop"], requireAll = false)
+@BindingAdapter(value = ["imageUrl", "circleCrop"], requireAll = false)
 fun ImageView.setImage(url: String?, circleCrop: Boolean = false) {
     if (url.isNullOrEmpty()) {
         return

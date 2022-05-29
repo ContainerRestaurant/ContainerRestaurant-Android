@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="TextAppearance.App.H1" parent="TextAppearance.App">
+        <item name="android:fontFamily">@font/spoqa_hans_sans_bold</item>
+        <item name="android:textSize" tools:ignore="SpUsage">28dp</item>
+        <item name="android:lineSpacingExtra">4dp</item>
+    </style>
+    <style name="TextAppearance.App.H2" parent="TextAppearance.App">
+        <item name="android:fontFamily">@font/spoqa_hans_sans_bold</item>
+        <item name="android:textSize" tools:ignore="SpUsage">24dp</item>
+        <item name="android:lineSpacingExtra">4dp</item>
+    </style>
+
+    <style name="TextAppearance.App.Subtitle1" parent="TextAppearance.App">
+        <item name="android:fontFamily">@font/spoqa_hans_sans_bold</item>
+        <item name="android:textSize" tools:ignore="SpUsage">18dp</item>
+        <item name="android:lineSpacingExtra">3dp</item>
+    </style>
+    <style name="TextAppearance.App.Subtitle2" parent="TextAppearance.App">
+        <item name="android:fontFamily">@font/spoqa_hans_sans_bold</item>
+        <item name="android:textSize" tools:ignore="SpUsage">16dp</item>
+        <item name="android:lineSpacingExtra">4dp</item>
+    </style>
+    <style name="TextAppearance.App.Subtitle3" parent="TextAppearance.App">
+        <item name="android:fontFamily">@font/spoqa_hans_sans_bold</item>
+        <item name="android:textSize" tools:ignore="SpUsage">14dp</item>
+        <item name="android:lineSpacingExtra">3dp</item>
+    </style>
+    <style name="TextAppearance.App.Subtitle4" parent="TextAppearance.App">
+        <item name="android:fontFamily">@font/spoqa_hans_sans_bold</item>
+        <item name="android:textSize" tools:ignore="SpUsage">12dp</item>
+        <item name="android:lineSpacingExtra">3dp</item>
+    </style>
+
+    <style name="TextAppearance.App.Body1" parent="TextAppearance.App">
+        <item name="android:fontFamily">@font/spoqa_hans_sans_regular</item>
+        <item name="android:textSize" tools:ignore="SpUsage">16dp</item>
+        <item name="android:lineSpacingExtra">4dp</item>
+    </style>
+    <style name="TextAppearance.App.Body2" parent="TextAppearance.App">
+        <item name="android:fontFamily">@font/spoqa_hans_sans_bold</item>
+        <item name="android:textSize" tools:ignore="SpUsage">14dp</item>
+        <item name="android:lineSpacingExtra">3dp</item>
+    </style>
+    <style name="TextAppearance.App.Body3" parent="TextAppearance.App">
+        <item name="android:fontFamily">@font/spoqa_hans_sans_regular</item>
+        <item name="android:textSize" tools:ignore="SpUsage">14dp</item>
+        <item name="android:lineSpacingExtra">3dp</item>
+    </style>
+
+    <style name="TextAppearance.App.Caption1" parent="TextAppearance.App">
+        <item name="android:fontFamily">@font/spoqa_hans_sans_regular</item>
+        <item name="android:textSize" tools:ignore="SpUsage">12dp</item>
+        <item name="android:lineSpacingExtra">3dp</item>
+    </style>
+    <style name="TextAppearance.App.Caption2" parent="TextAppearance.App">
+        <item name="android:fontFamily">@font/spoqa_hans_sans_bold</item>
+        <item name="android:textSize" tools:ignore="SpUsage">12dp</item>
+        <item name="android:lineSpacingExtra">3dp</item>
+    </style>
+    <style name="TextAppearance.App.Caption3" parent="TextAppearance.App">
+        <item name="android:fontFamily">@font/spoqa_hans_sans_bold</item>
+        <item name="android:textSize" tools:ignore="SpUsage">10dp</item>
+        <item name="android:lineSpacingExtra">1dp</item>
+    </style>
+    <style name="TextAppearance.App.Caption4" parent="TextAppearance.App">
+        <item name="android:fontFamily">@font/spoqa_hans_sans_regular</item>
+        <item name="android:textSize" tools:ignore="SpUsage">10dp</item>
+        <item name="android:lineSpacingExtra">1dp</item>
+    </style>
+</resources>

@@ -3,14 +3,10 @@ package container.restaurant.android.presentation.feed.detail
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import container.restaurant.android.R
 import container.restaurant.android.databinding.ActivityFeedDetailBinding
@@ -30,14 +26,40 @@ class FeedDetailActivity : BaseActivity<ActivityFeedDetailBinding, FeedDetailVie
         super.onCreate(savedInstanceState)
         viewDataBinding.viewModel = viewModel
 
+        initData()
+        observeData()
+    }
+
+    private fun initData() {
+        initFeedId()
+        getFeedDetail()
+        getFeedCommentReply()
+    }
+
+    private fun initFeedId() {
         val feedId = intent.getIntExtra(DataTransfer.FEED_ID, -1)
         viewModel.feedId.value = feedId
+    }
+
+    private fun getFeedDetail() {
         lifecycleScope.launchWhenCreated {
             val tokenBearer = SharedPrefUtil.getString(appCompatActivity) { TOKEN_BEARER }
+            val feedId = viewModel.feedId.value ?: -1
             viewModel.getFeedDetail(tokenBearer, feedId)
         }
+    }
 
-        observeData()
+    private fun getFeedCommentReply() {
+        lifecycleScope.launchWhenCreated {
+            val tokenBearer = SharedPrefUtil.getString(appCompatActivity) { TOKEN_BEARER }
+            val feedId = viewModel.feedId.value ?: -1
+            viewModel.getFeedCommentReply(
+                tokenBearer,
+                feedId,
+                onGetSuccess = {},
+                onGetFail = {}
+            )
+        }
     }
 
     private fun observeData() {

@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="indicator_size">2dp</dimen>
+    <dimen name="comment_user_icon_size">32dp</dimen>
+    <dimen name="comment_user_icon_half_size">16dp</dimen>
+    <dimen name="comment_user_nickname_margin">10dp</dimen>
 </resources>

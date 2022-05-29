@@ -210,6 +210,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         tools:text="0"
+                        android:text="@{``+viewModel.commentReplyItemList.size()}"
                         android:layout_marginStart="6dp"
                         android:textAppearance="@style/TextAppearance.App.B.Gray05"
                         android:textSize="14dp"
@@ -217,6 +218,17 @@
                         app:layout_constraintStart_toEndOf="@id/tv_comment"
                         app:layout_constraintTop_toTopOf="@id/tv_comment"
                         app:layout_constraintBottom_toBottomOf="@id/tv_comment"/>
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_comment"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        android:orientation="vertical"
+                        tools:listitem="@layout/item_comment_reply"
+                        tools:itemCount="1"
+                        bind:dino_itemLayout="@{@layout/item_comment_reply}"
+                        bind:dino_eventHolder="@{viewModel}"
+                        bind:dino_items="@{viewModel.commentReplyItemList}"/>
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>

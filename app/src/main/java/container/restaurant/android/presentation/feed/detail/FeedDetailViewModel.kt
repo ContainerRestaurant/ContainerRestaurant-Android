@@ -2,22 +2,21 @@ package container.restaurant.android.presentation.feed.detail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.viewpager2.widget.ViewPager2
 import container.restaurant.android.data.FeedCategory
 import container.restaurant.android.data.repository.FeedDetailRepository
 import container.restaurant.android.data.response.FeedDetailResponse
 import container.restaurant.android.presentation.base.BaseViewModel
+import container.restaurant.android.presentation.feed.item.CommentReplyItem
 import container.restaurant.android.util.Event
 import container.restaurant.android.util.SingleLiveEvent
 import container.restaurant.android.util.handleApiResponse
 import kotlinx.coroutines.flow.collect
-import okhttp3.internal.notifyAll
-import timber.log.Timber
 
 class FeedDetailViewModel(private val feedDetailRepository: FeedDetailRepository): BaseViewModel() {
 
     val feedId = MutableLiveData<Int>()
+
+    val commentReplyItemList = MutableLiveData<List<CommentReplyItem>>()
 
     private val _ownerNickname: MutableLiveData<String> = MutableLiveData()
     val ownerNickname: LiveData<String> = _ownerNickname
@@ -149,6 +148,27 @@ class FeedDetailViewModel(private val feedDetailRepository: FeedDetailRepository
                         onCancelFail()
                     }, onException = {
                         onCancelFail()
+                    }
+                )
+            }
+    }
+
+    suspend fun getFeedCommentReply(tokenBearer: String, feedId: Int, onGetSuccess: () -> Unit, onGetFail: () -> Unit) {
+        feedDetailRepository.getFeedCommentReply(tokenBearer, feedId)
+            .collect { response ->
+                handleApiResponse(
+                    response = response,
+                    onSuccess = {
+                        val commentReplyItemList = mutableListOf<CommentReplyItem>()
+                        it.data?.dataWrapper?.commentReplyList?.forEach { commentReply ->
+                            commentReplyItemList.add(CommentReplyItem(commentReply))
+                        }
+                        this.commentReplyItemList.value = commentReplyItemList
+                        onGetSuccess()
+                    }, onError = {
+                        onGetFail()
+                    }, onException = {
+                        onGetFail()
                     }
                 )
             }
