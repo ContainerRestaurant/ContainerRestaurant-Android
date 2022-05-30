@@ -296,10 +296,13 @@
                     android:id="@+id/button_register"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:paddingVertical="10dp"
                     android:background="@android:color/transparent"
                     android:text="@string/register"
                     android:textAppearance="@style/TextAppearance.App.R.Gray05"
                     android:textColor="@color/green_02"
+                    android:maxLines="3"
+                    android:onClick="@{() -> viewModel.onRegisterCommentOrReplyClick()}"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>

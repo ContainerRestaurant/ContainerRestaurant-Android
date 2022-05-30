@@ -10,6 +10,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.dino.library.dinorecyclerview.DinoAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import container.restaurant.android.R
+import container.restaurant.android.data.request.CommentReplyRequest
 import container.restaurant.android.databinding.ActivityFeedDetailBinding
 import container.restaurant.android.presentation.base.BaseActivity
 import container.restaurant.android.presentation.feed.item.FeedCommentAdapter
@@ -111,6 +112,30 @@ class FeedDetailActivity : BaseActivity<ActivityFeedDetailBinding, FeedDetailVie
                     scrapFeed(viewModel.feedId.value ?: 0, isScrapActivated, scrapCount)
                 }
             }
+            isRegisterCommentOrReplyClicked.observe(appCompatActivity) {
+                registerComment()
+            }
+        }
+    }
+
+    private fun registerComment() {
+        val appCompatActivity = this@FeedDetailActivity
+        lifecycleScope.launchWhenCreated {
+            val tokenBearer = SharedPrefUtil.getString(appCompatActivity) { TOKEN_BEARER }
+            val feedId = viewModel.feedId.value ?: -1
+            val content = viewDataBinding.etComment.text.toString()
+            viewModel.registerComment(
+                tokenBearer,
+                feedId,
+                CommentReplyRequest(content),
+                onPostSuccess = {
+                    viewDataBinding.etComment.setText("")
+                    getFeedCommentReply()
+                },
+                onPostFail = {
+                    toastShortOfFailMessage("댓글 등록")
+                }
+            )
         }
     }
 

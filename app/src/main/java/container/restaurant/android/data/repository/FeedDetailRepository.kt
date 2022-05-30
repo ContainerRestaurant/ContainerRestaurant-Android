@@ -6,6 +6,7 @@ import com.skydoves.sandwich.suspendOnException
 import com.skydoves.sandwich.suspendOnSuccess
 import container.restaurant.android.data.remote.FeedDetailService
 import container.restaurant.android.data.remote.FeedExploreService
+import container.restaurant.android.data.request.CommentReplyRequest
 import container.restaurant.android.util.flowApiResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
@@ -49,4 +50,8 @@ class FeedDetailRepository(
     @WorkerThread
     suspend fun getFeedCommentReply(tokenBearer: String, feedId: Int) =
         flowApiResponse(feedDetailService.getFeedCommentReply(tokenBearer, feedId))
+
+    @WorkerThread
+    suspend fun registerCommentOrReply(tokenBearer: String, feedId: Int, commentReplyRequest: CommentReplyRequest) =
+        flowApiResponse(feedDetailService.registerCommentOrReply(tokenBearer, feedId, commentReplyRequest))
 }

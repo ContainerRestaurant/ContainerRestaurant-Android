@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import container.restaurant.android.data.FeedCategory
 import container.restaurant.android.data.repository.FeedDetailRepository
+import container.restaurant.android.data.request.CommentReplyRequest
 import container.restaurant.android.data.response.FeedDetailResponse
 import container.restaurant.android.presentation.base.BaseViewModel
 import container.restaurant.android.presentation.feed.item.CommentReplyItem
@@ -180,6 +181,28 @@ class FeedDetailViewModel(
             }
     }
 
+    suspend fun registerComment(
+        tokenBearer: String,
+        feedId: Int,
+        commentReplyRequest: CommentReplyRequest,
+        onPostSuccess: () -> Unit,
+        onPostFail: () -> Unit
+    ) {
+        feedDetailRepository.registerCommentOrReply(tokenBearer, feedId, commentReplyRequest)
+            .collect { response ->
+                handleApiResponse(
+                    response = response,
+                    onSuccess = {
+                        onPostSuccess()
+                    }, onException = {
+                        onPostFail()
+                    }, onError = {
+                        onPostFail()
+                    }
+                )
+            }
+    }
+
     override fun onCommentShowMoreClick(item: CommentReplyItem) {
         //TODO("Not yet implemented")
     }
@@ -208,4 +231,12 @@ class FeedDetailViewModel(
     fun onBackButtonClick() {
         _isBackButtonClicked.value = Event(true)
     }
+
+    private val _isRegisterCommentOrReplyClicked = SingleLiveEvent<Void>()
+    val isRegisterCommentOrReplyClicked: LiveData<Void> = _isRegisterCommentOrReplyClicked
+
+    fun onRegisterCommentOrReplyClick() {
+        _isRegisterCommentOrReplyClicked.call()
+    }
+
 }
