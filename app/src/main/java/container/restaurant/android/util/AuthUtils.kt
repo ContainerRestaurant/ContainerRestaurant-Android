@@ -21,6 +21,8 @@ class ValidationCheck {
     }
 }
 
+const val BEARER_PREFIX = "Bearer "
+
 fun letterValidationCheck(string: String): Boolean {
     val matcher = ValidationCheck.impossibleLetterPattern.matcher(string)
     if (matcher.find()) return false
@@ -94,9 +96,7 @@ suspend fun ifAlreadySignIn(
                                     provider,
                                     kakaoAccessToken,
                                     onGenerateSuccess = { token, userId ->
-                                        SharedPrefUtil.setBoolean(fragmentActivity, { IS_USER_LOGIN }, true)
-                                        if(token != null) SharedPrefUtil.setString(fragmentActivity, { TOKEN_BEARER }, "Bearer $token")
-                                        if(userId != null) SharedPrefUtil.setInt(fragmentActivity, { USER_ID }, userId)
+                                        setAuthInfo(fragmentActivity, token, userId)
                                         onSignInSuccess(null)
                                     }, onGenerateFail = {
                                         Toast.makeText(fragmentActivity, "회원가입 혹은 로그인에 실패하였습니다.", Toast.LENGTH_SHORT).show()
@@ -109,6 +109,12 @@ suspend fun ifAlreadySignIn(
             }
         }
     )
+}
+
+fun setAuthInfo(context: Context, token: String?, userId: Int?) {
+    SharedPrefUtil.setBoolean(context, { IS_USER_LOGIN }, true)
+    if(token != null) SharedPrefUtil.setString(context, { TOKEN_BEARER }, "$BEARER_PREFIX$token")
+    if(userId != null) SharedPrefUtil.setInt(context, { USER_ID }, userId)
 }
 
 fun kakaoLogin(context: Context, callback:(OAuthToken?, Throwable?) -> Unit) {

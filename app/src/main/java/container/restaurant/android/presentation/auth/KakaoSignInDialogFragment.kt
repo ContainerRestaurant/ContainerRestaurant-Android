@@ -62,7 +62,8 @@ class KakaoSignInDialogFragment(val onSignInSuccess:(UserInfoResponse)->Unit,val
                         viewModel.generateAccessToken(
                             Provider.KAKAO.providerStr,
                             token.accessToken,
-                            {
+                            { token, userId ->
+                                setAuthInfo(requireContext(), token, userId)
                                 signInWithAccessToken()
                             },
                             onGenerateFail = {
@@ -92,6 +93,9 @@ class KakaoSignInDialogFragment(val onSignInSuccess:(UserInfoResponse)->Unit,val
                 onSignInSuccess = {
                     onSignInSuccess(it)
                     dismiss()
+                },
+                onInvalidToken = {
+                    Toast.makeText(requireContext(),"올바르지 않은 토큰입니다.", Toast.LENGTH_SHORT).show()
                 }
             )
         }

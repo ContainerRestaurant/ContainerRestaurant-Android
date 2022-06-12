@@ -7,9 +7,7 @@ import container.restaurant.android.R
 import container.restaurant.android.data.repository.AuthRepository
 import container.restaurant.android.data.response.UserInfoResponse
 import container.restaurant.android.presentation.base.BaseViewModel
-import container.restaurant.android.util.Event
-import container.restaurant.android.util.SingleLiveEvent
-import container.restaurant.android.util.handleApiResponse
+import container.restaurant.android.util.*
 import kotlinx.coroutines.flow.collect
 
 class KakaoSignInDialogViewModel(private val authRepository: AuthRepository): BaseViewModel() {
@@ -22,7 +20,7 @@ class KakaoSignInDialogViewModel(private val authRepository: AuthRepository): Ba
     private val _errorMessageId = MutableLiveData<Event<Int>>()
     val errorMessageId: LiveData<Event<Int>> = _errorMessageId
 
-    suspend fun generateAccessToken(provider: String, accessToken: String, onGenerateSuccess: () -> Unit, onGenerateFail: () -> Unit) {
+    suspend fun generateAccessToken(provider: String, accessToken: String, onGenerateSuccess: (token: String?, userId: Int?) -> Unit, onGenerateFail: () -> Unit) {
         authRepository.generateAccessToken(
             provider = provider,
             accessToken = accessToken
@@ -30,7 +28,8 @@ class KakaoSignInDialogViewModel(private val authRepository: AuthRepository): Ba
             handleApiResponse(
                 response = response,
                 onSuccess = {
-
+                    _tokenBearer.value = "$BEARER_PREFIX${it.data?.token}"
+                    onGenerateSuccess(it.data?.token, it.data?.id)
                 },
                 onError = {
                     when (it.statusCode) {
@@ -41,8 +40,10 @@ class KakaoSignInDialogViewModel(private val authRepository: AuthRepository): Ba
                             _errorMessageId.value = Event(R.string.error_message_other)
                         }
                     }
+                    onGenerateFail()
                 }, onException = {
                     _errorMessageId.value = Event(R.string.error_message_other)
+                    onGenerateFail()
                 }
             )
         }

@@ -71,7 +71,7 @@ internal class SignUpFragment : BaseFragment<FragmentSignUpBinding, AuthViewMode
                     viewModel.generateAccessToken(provider!!, accessToken!!
                         ,onGenerateSuccess = { token, userId ->
                             SharedPrefUtil.setBoolean(requireContext(), { IS_USER_LOGIN }, true)
-                            if(token != null) SharedPrefUtil.setString(requireContext(), { TOKEN_BEARER }, "Bearer $token")
+                            if(token != null) SharedPrefUtil.setString(requireContext(), { TOKEN_BEARER }, "$BEARER_PREFIX$token")
                             if(userId != null) SharedPrefUtil.setInt(requireContext(), { USER_ID }, userId)
                             requireActivity().apply {
                                 setResult(Activity.RESULT_OK)
