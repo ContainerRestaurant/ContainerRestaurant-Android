@@ -67,7 +67,7 @@ class KakaoSignInDialogFragment(val onSignInSuccess:(UserInfoResponse)->Unit,val
                                 signInWithAccessToken()
                             },
                             onGenerateFail = {
-                                Toast.makeText(requireContext(), "회원가입에 실패하였습니다.", Toast.LENGTH_SHORT).show()
+                                toastShortOfFailMessage(requireContext(), "회원가입")
                             }
                         )
                     }
@@ -94,8 +94,9 @@ class KakaoSignInDialogFragment(val onSignInSuccess:(UserInfoResponse)->Unit,val
                     onSignInSuccess(it)
                     dismiss()
                 },
-                onInvalidToken = {
-                    Toast.makeText(requireContext(),"올바르지 않은 토큰입니다.", Toast.LENGTH_SHORT).show()
+                onSignInFail = {
+                    toastShort(requireContext(), "올바르지 않은 토큰입니다.")
+                    dismiss()
                 }
             )
         }

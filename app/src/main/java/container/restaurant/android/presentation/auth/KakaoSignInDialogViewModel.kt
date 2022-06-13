@@ -53,7 +53,7 @@ class KakaoSignInDialogViewModel(private val authRepository: AuthRepository): Ba
         tokenBearer: String,
         onNicknameNull: () -> Unit = {},
         onSignInSuccess: (UserInfoResponse) -> Unit = {},
-        onInvalidToken: () -> Unit = {}
+        onSignInFail: () -> Unit
     ) {
         authRepository.signInWithAccessToken(tokenBearer)
             .collect { response ->
@@ -69,9 +69,10 @@ class KakaoSignInDialogViewModel(private val authRepository: AuthRepository): Ba
                         }
                     },
                     onError = {
-                        if (it.statusCode == StatusCode.Unauthorized) {
-                            onInvalidToken()
-                        }
+                        onSignInFail()
+                    },
+                    onException = {
+                        onSignInFail()
                     }
                 )
             }

@@ -1,6 +1,7 @@
 package container.restaurant.android.util
 
 import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import com.skydoves.sandwich.ApiResponse
 import com.skydoves.sandwich.suspendOnError
@@ -59,3 +60,21 @@ fun <T> flowApiResponse(response: ApiResponse<T>): Flow<ApiResponse<T>> =
                 emit(this)
             }
     }.flowOn(Dispatchers.IO)
+
+fun toastShort(context: Context, message: String) {
+    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+}
+
+fun toastLong(context: Context, message: String) {
+    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+}
+
+fun toastShortOfFailMessage(context: Context, message: String) {
+    val failFullMessage = context.getString(R.string.failed_message, message)
+    toastShort(context, failFullMessage)
+}
+
+fun toastLongOfFailMessage(context: Context, message: String) {
+    val failFullMessage = context.getString(R.string.failed_message, message)
+    toastLong(context, failFullMessage)
+}
