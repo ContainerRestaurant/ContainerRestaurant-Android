@@ -5,6 +5,7 @@ import android.graphics.Typeface
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.StyleSpan
+import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -185,6 +186,18 @@ fun ImageView.setEmptyFeedBackgroundSetup(boolean: String) {
 fun TextView.setHtmlText(htmlText: String?) {
     htmlText?.let {
         text = HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_LEGACY)
+    }
+}
+
+@BindingAdapter(value = ["htmlTextToString", "willBeTrimmed"], requireAll = false)
+fun TextView.setHtmlTextToString(htmlText: String?, willBeTrimmed: Boolean? = false) {
+    htmlText?.let {
+        val htmlTextToStringResult = HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
+        if(willBeTrimmed == true) {
+            text = htmlTextToStringResult.trim()
+            return
+        }
+        text = htmlTextToStringResult
     }
 }
 
