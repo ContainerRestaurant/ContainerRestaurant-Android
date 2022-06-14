@@ -48,6 +48,7 @@ class KakaoSignInDialogFragment(val onSignInSuccess:(UserInfoResponse)->Unit,val
     private val kakaoCallback: (OAuthToken?, Throwable?) -> Unit = { token, err ->
         if (err != null) {
             Timber.e(err, "카카오 인증 실패")
+            toastShortOfFailMessage(requireContext(), "카카오 인증")
             dismiss()
         } else if (token != null) {
             kakaoUserApi.me { userKakao, err2 ->
