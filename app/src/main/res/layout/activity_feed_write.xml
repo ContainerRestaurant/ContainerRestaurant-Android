@@ -58,7 +58,7 @@
                 android:background="@drawable/edit_text_bg"
                 android:gravity="center_vertical"
                 android:paddingHorizontal="13dp"
-                bind:stripHtmlText="@{viewModel.placeName}"
+                bind:stripHtmlText="@{viewModel.selectedLocationItem.title}"
                 android:hint="@string/restaurant_name_hint"
                 android:textColorHint="@color/gray_05"
                 android:fontFamily="@font/spoqa_hans_sans_regular"
@@ -516,6 +516,7 @@
                 android:layout_height="148dp">
                 <EditText
                     android:id="@+id/et_content"
+                    android:text="@={viewModel.content}"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:hint="@string/write_content_hint"

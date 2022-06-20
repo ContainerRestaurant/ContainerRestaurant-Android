@@ -6,10 +6,7 @@ import container.restaurant.android.data.repository.FeedWriteRepository
 import container.restaurant.android.data.request.FeedWriteRequest
 import container.restaurant.android.data.response.SearchLocationResponse
 import container.restaurant.android.presentation.base.BaseViewModel
-import container.restaurant.android.util.Event
-import container.restaurant.android.util.RecyclerViewItemClickListeners
-import container.restaurant.android.util.SingleLiveEvent
-import container.restaurant.android.util.handleApiResponse
+import container.restaurant.android.util.*
 import kotlinx.coroutines.flow.collect
 import timber.log.Timber
 
@@ -38,6 +35,9 @@ internal class FeedWriteViewModel(private val feedWriteRepository: FeedWriteRepo
         MutableLiveData<List<SearchLocationResponse.Item>>()
     val searchLocationList: LiveData<List<SearchLocationResponse.Item>> = _searchLocationList
 
+    private val _selectedLocationItem = MutableLiveData<SearchLocationResponse.Item>()
+    val selectedLocationItem: LiveData<SearchLocationResponse.Item> = _selectedLocationItem
+
     // 식당 검색 결과 선택 시 바뀌는 이름
     private val _placeName: MutableLiveData<String> = MutableLiveData()
     val placeName: LiveData<String> = _placeName
@@ -45,7 +45,9 @@ internal class FeedWriteViewModel(private val feedWriteRepository: FeedWriteRepo
     // 검색창에 입력이 일어날 때마다 바뀌는 이름
     val searchPlaceName: MutableLiveData<String> = MutableLiveData()
 
-    var isWelcomed = false
+    val isWelcomed = MutableLiveData<Boolean>(false)
+
+    val difficulty = MutableLiveData<Int>()
 
     val categoryList = mutableListOf(
         CategorySelection(FoodCategory.KOREAN),
@@ -62,6 +64,7 @@ internal class FeedWriteViewModel(private val feedWriteRepository: FeedWriteRepo
     // 사용자가 선택한 음식 카테고리를 저장하는 변수. 선택되지 않았으면 null임
     var selectedFoodCategory: FoodCategory? = null
 
+    val content = MutableLiveData<String>()
 
     fun erasePlaceName() {
         _placeName.value = ""
@@ -128,12 +131,8 @@ internal class FeedWriteViewModel(private val feedWriteRepository: FeedWriteRepo
         _isBackButtonClicked.value = Event(true)
     }
 
-    private val _isWelcomedButtonClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
-    val isWelcomedButtonClicked: LiveData<Event<Boolean>> = _isWelcomedButtonClicked
-
     fun onWelcomedButtonClick() {
-        isWelcomed = !isWelcomed
-        _isWelcomedButtonClicked.value = Event(isWelcomed)
+        isWelcomed.value = isWelcomed.value?.not()
     }
 
     private val _isCloseSearchButtonClicked: MutableLiveData<Event<Boolean>> = MutableLiveData()
@@ -161,7 +160,14 @@ internal class FeedWriteViewModel(private val feedWriteRepository: FeedWriteRepo
     val isSearchResultItemClicked: LiveData<Event<Boolean>> = _isSearchResultItemClicked
 
     override fun onSearchResultItemClick(item: SearchLocationResponse.Item) {
-        _placeName.value = item.title
+//        _placeName.value = item.title
+        _selectedLocationItem.value = item
+        val geoPoint = GeoTrans.convert(GeoTrans.KATEC, GeoTrans.GEO, GeoPoint(item.mapx.toDouble(), item.mapy.toDouble()))
+        val tmPoint = GeoTrans.convert(GeoTrans.KATEC, GeoTrans.TM, GeoPoint(item.mapx.toDouble(), item.mapy.toDouble()))
+        Timber.d("katec to geo ${geoPoint.x},${geoPoint.y}")
+        Timber.d("katec to tm ${tmPoint.x},${tmPoint.y}")
+//        Timber.d("katec to grs80 ${GeoTrans.convert(GeoTrans.KATEC, GeoTrans.GRS80, GeoPoint(item.mapx.toDouble(), item.mapy.toDouble()))}")
+        Timber.d("selected location item : $item")
         _isSearchResultItemClicked.value = Event(true)
     }
 

@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.core.text.HtmlCompat
 import androidx.databinding.BindingAdapter
+import androidx.databinding.InverseBindingAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy

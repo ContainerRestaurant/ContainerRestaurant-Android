@@ -22,12 +22,12 @@ data class FeedWriteRequest(
     )
 
     data class MainMenu(
-        @SerializedName("menuName") val menuName: String,
-        @SerializedName("container") val container: String
+        @SerializedName("menuName") val menuName: String?,
+        @SerializedName("container") val container: String?
     )
 
     data class SubMenu(
-        @SerializedName("menuName") val menuName: String,
-        @SerializedName("container") val container: String
+        @SerializedName("menuName") val menuName: String?,
+        @SerializedName("container") val container: String?
     )
 }

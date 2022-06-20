@@ -8,7 +8,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -24,6 +24,7 @@ import container.restaurant.android.dialog.AlertDialog
 import container.restaurant.android.dialog.SimpleConfirmDialog
 import container.restaurant.android.presentation.base.BaseActivity
 import container.restaurant.android.util.EventObserver
+import container.restaurant.android.util.SharedPrefUtil
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import java.io.InputStream
@@ -89,8 +90,7 @@ internal class FeedWriteActivity : BaseActivity<ActivityFeedWriteBinding, FeedWr
                     onBackPressed()
                 }
             })
-            isWelcomedButtonClicked.observe(this@FeedWriteActivity , EventObserver {
-                Timber.d("onWelcomeButtonClick $it")
+            isWelcomed.observe(this@FeedWriteActivity) {
                 if(it) {
                     viewDataBinding.badgeFilled.visibility = View.VISIBLE
                     viewDataBinding.ivBadgeUnfilled.visibility = View.INVISIBLE
@@ -100,7 +100,7 @@ internal class FeedWriteActivity : BaseActivity<ActivityFeedWriteBinding, FeedWr
                     viewDataBinding.badgeFilled.visibility = View.INVISIBLE
                     viewDataBinding.ivBadgeUnfilled.visibility = View.VISIBLE
                 }
-            })
+            }
             isSearchEditTextClicked.observe(this@FeedWriteActivity, EventObserver {
                 if(it) {
                     onClickNameSearch()
@@ -122,7 +122,7 @@ internal class FeedWriteActivity : BaseActivity<ActivityFeedWriteBinding, FeedWr
             })
 
             isCompleteClicked.observe(this@FeedWriteActivity) {
-
+                postFeed()
             }
         }
     }
@@ -166,6 +166,42 @@ internal class FeedWriteActivity : BaseActivity<ActivityFeedWriteBinding, FeedWr
 //            observe(mainFoodList, ::getMainFoodList)
 //            observe(sideDishList, ::getSideDishList)
 //            observe(loginChk.asLiveData()) { updateFeed(it) }
+        }
+    }
+
+    private fun postFeed() {
+        lifecycleScope.launchWhenCreated {
+            // Todo 위도, 경도랑 이미지 업로드 작업 진행해야 함
+            val restaurantCreateDto = FeedWriteRequest.RestaurantCreateDto(
+                viewModel.selectedLocationItem.value?.title ?: "",
+                viewModel.selectedLocationItem.value?.address ?: "",
+                0.0,
+                0.0
+            )
+            val category = viewModel.selectedFoodCategory?.toString() ?: ""
+            val mainMenuList = viewModel.mainMenuList.value?.map {
+                FeedWriteRequest.MainMenu(it.menuName.value, it.container.value)
+            }
+            val subMenuList = viewModel.subMenuList.value?.map {
+                FeedWriteRequest.SubMenu(it.menuName.value, it.container.value)
+            }
+            val content = viewModel.content.value ?: ""
+            val isWelcomed = viewModel.isWelcomed.value ?: false
+            val difficulty = viewDataBinding.sbDifficulty.childCount
+            val tokenBearer = SharedPrefUtil.getString(this@FeedWriteActivity) { TOKEN_BEARER }
+            viewModel.postFeed(
+                tokenBearer,
+                FeedWriteRequest(
+                    restaurantCreateDto,
+                    category,
+                    difficulty,
+                    isWelcomed,
+                    0,
+                    content,
+                    mainMenuList ?: listOf(),
+                    subMenuList ?: listOf(),
+                )
+            )
         }
     }
 
