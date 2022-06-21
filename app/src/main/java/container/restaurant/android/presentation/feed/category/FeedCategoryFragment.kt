@@ -1,24 +1,15 @@
 package container.restaurant.android.presentation.feed.category
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import container.restaurant.android.R
 import container.restaurant.android.data.FeedCategory
 import container.restaurant.android.data.SortingCategory
 import container.restaurant.android.databinding.FragmentFeedCategoryBinding
 import container.restaurant.android.presentation.base.BaseFragment
 import container.restaurant.android.presentation.feed.detail.FeedDetailActivity
-import container.restaurant.android.presentation.feed.item.ContainerFeedAdapter
 import container.restaurant.android.util.DataTransfer
 import container.restaurant.android.util.EventObserver
 import container.restaurant.android.util.SharedPrefUtil
@@ -37,11 +28,37 @@ internal class FeedCategoryFragment : BaseFragment<FragmentFeedCategoryBinding, 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewDataBinding.viewModel = viewModel
+        initData()
+        observeData()
+    }
+
+    private fun initData() {
+        getFeedList()
+        initSwipeRefreshLayout()
+    }
+
+    private fun initSwipeRefreshLayout() {
+        viewDataBinding.swipeRefreshLayoutFeedCategory.setOnRefreshListener {
+            getFeedList(true)
+        }
+    }
+
+    private fun getFeedList(isRefreshMode: Boolean = false) {
         lifecycleScope.launchWhenCreated {
             val tokenBearer = SharedPrefUtil.getString(requireContext()) { TOKEN_BEARER }
-            viewModel.getFeedList(tokenBearer, SortingCategory.LATEST)
+            viewModel.getFeedList(
+                tokenBearer,
+                SortingCategory.LATEST,
+                onGetSuccess = {
+                    if (isRefreshMode) {
+                        viewDataBinding.swipeRefreshLayoutFeedCategory.isRefreshing = false
+                    }
+                },
+                onGetFail = {
+                    toastShortOfFailMessage("피드 가져오기")
+                }
+            )
         }
-        observeData()
     }
 
     private fun observeData() {

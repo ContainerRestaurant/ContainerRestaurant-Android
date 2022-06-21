@@ -23,7 +23,7 @@ internal class FeedCategoryViewModel(
 
     var selectedFeedId: Int = -1
 
-    suspend fun getFeedList(tokenBearer: String, sortingCategory: SortingCategory) {
+    suspend fun getFeedList(tokenBearer: String, sortingCategory: SortingCategory, onGetSuccess: () -> Unit, onGetFail: () -> Unit) {
         val categoryName =
             if (feedCategory.name == FeedCategory.ALL.name) null
             else feedCategory.name
@@ -39,7 +39,13 @@ internal class FeedCategoryViewModel(
                                 }
                             }
                         _feedList.value = tempFeedItemList
-                        Timber.d("feedList.value = ${feedList.value}")
+                        onGetSuccess()
+                    },
+                    onError = {
+                        onGetFail()
+                    },
+                    onException = {
+                        onGetFail()
                     }
                 )
             }
