@@ -15,8 +15,6 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import container.restaurant.android.R
 import container.restaurant.android.data.FoodPhoto
-import container.restaurant.android.data.db.entity.MainFood
-import container.restaurant.android.data.db.entity.SideDish
 import container.restaurant.android.data.request.FeedWriteRequest
 import container.restaurant.android.data.response.ImageUploadResponse
 import container.restaurant.android.databinding.ActivityFeedWriteBinding
@@ -26,19 +24,15 @@ import container.restaurant.android.presentation.base.BaseActivity
 import container.restaurant.android.util.EventObserver
 import container.restaurant.android.util.SharedPrefUtil
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 import java.io.InputStream
 
-internal class FeedWriteActivity : BaseActivity<ActivityFeedWriteBinding, FeedWriteViewModel>(), View.OnClickListener {
+internal class FeedWriteActivity : BaseActivity<ActivityFeedWriteBinding, FeedWriteViewModel>() {
 
     override val layoutResId: Int = R.layout.activity_feed_write
     override val viewModel: FeedWriteViewModel by viewModel()
     private val bottomSheetFragment = FeedWriteBottomSheetFragment()
 
-    private var restaurantCreateDto: FeedWriteRequest.RestaurantCreateDto? = null
-    private var categoryStr = "CHINESE"
     private var imageUploadId: Int? = null
-    private var welcome = false
 
     private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if(result.resultCode == Activity.RESULT_OK) {
@@ -66,8 +60,6 @@ internal class FeedWriteActivity : BaseActivity<ActivityFeedWriteBinding, FeedWr
         viewDataBinding.viewModel = viewModel
 
         observeData()
-        setBindItem()
-        subscribeUi()
         difficultyAction()
         setUpRecyclerViewCategorySelection()
     }
@@ -115,7 +107,7 @@ internal class FeedWriteActivity : BaseActivity<ActivityFeedWriteBinding, FeedWr
 
             isErasePlaceNameClicked.observe(this@FeedWriteActivity, EventObserver {
                 if(it) {
-                    if(placeName.value != null && placeName.value != "") {
+                    if(!selectedLocationItem.value?.name.isNullOrEmpty()) {
                         erasePlaceName()
                     }
                 }
@@ -152,32 +144,10 @@ internal class FeedWriteActivity : BaseActivity<ActivityFeedWriteBinding, FeedWr
         dialog.show(supportFragmentManager,"SimpleConfirmDialog")
     }
 
-    private fun setBindItem() {
-        viewDataBinding.apply {
-            btnFeedUpdate.setOnClickListener(this@FeedWriteActivity)
-        }
-    }
-
-    private fun subscribeUi() {
-        with(viewModel) {
-//            observe(viewLoading, ::loadingCheck)
-//            observe(getErrorMsg, ::errorDialog)
-//
-//            observe(mainFoodList, ::getMainFoodList)
-//            observe(sideDishList, ::getSideDishList)
-//            observe(loginChk.asLiveData()) { updateFeed(it) }
-        }
-    }
-
     private fun postFeed() {
         lifecycleScope.launchWhenCreated {
-            // Todo 위도, 경도랑 이미지 업로드 작업 진행해야 함
-            val restaurantCreateDto = FeedWriteRequest.RestaurantCreateDto(
-                viewModel.selectedLocationItem.value?.title ?: "",
-                viewModel.selectedLocationItem.value?.address ?: "",
-                0.0,
-                0.0
-            )
+            // Todo 이미지 업로드 작업 진행해야 함
+            val restaurantCreateDto = viewModel.selectedLocationItem.value ?: FeedWriteRequest.RestaurantCreateDto("","",0.0,0.0)
             val category = viewModel.selectedFoodCategory?.toString() ?: ""
             val mainMenuList = viewModel.mainMenuList.value?.map {
                 FeedWriteRequest.MainMenu(it.menuName.value, it.container.value)
@@ -205,44 +175,8 @@ internal class FeedWriteActivity : BaseActivity<ActivityFeedWriteBinding, FeedWr
         }
     }
 
-    private fun updateFeed(chk: Boolean) {
-        if(chk) {
-//            viewModel.loginChk.value = false
-
-            if(feedNullCheck()) {
-                val restaurantCreateDto = restaurantCreateDto
-                val category = categoryStr
-                val difficulty = viewDataBinding.sbDifficulty.childCount
-                val welcome = welcome
-                val thumbnailImageId = imageUploadId ?: 9
-                val content = viewDataBinding.etContent.text.toString()
-                val mainMenuList: MutableList<FeedWriteRequest.MainMenu> = mutableListOf()
-//                mainFoodAdapter.currentList.forEach {
-//                    mainMenuList.add(FeedWriteRequest.MainMenu(it.foodName, it.bottle))
-//                }
-                val subMenuList: MutableList<FeedWriteRequest.SubMenu> = mutableListOf()
-//                sideDishAdapter.currentList.forEach {
-//                    subMenuList.add(FeedWriteRequest.SubMenu(it.quantity, it.bottle))
-//                }
-
-                val feedWriteRequest = FeedWriteRequest(
-                    restaurantCreateDto= restaurantCreateDto!!,
-                    category= category,
-                    difficulty= difficulty,
-                    welcome= welcome,
-                    thumbnailImageId= thumbnailImageId,
-                    content= content,
-                    mainMenu= mainMenuList,
-                    subMenu= subMenuList
-                )
-
-//                observe(viewModel.updateFeed(feedWriteRequest), ::feedWriteComplete)
-            }
-        }
-    }
-
     private fun feedNullCheck(): Boolean {
-        if(restaurantCreateDto == null) {
+        if(viewModel.selectedLocationItem.value == null) {
             simpleDialog("Warning", "식당을 선택해주세요", AlertDialog.WARNING_TYPE)
             return false
         }
@@ -260,17 +194,6 @@ internal class FeedWriteActivity : BaseActivity<ActivityFeedWriteBinding, FeedWr
         if(!AlertDialog.showCheck)
             dialog.show()
 
-    }
-
-
-    private fun getMainFoodList(list: List<MainFood>) {
-//        binding.rvMainFood.adapter = mainFoodAdapter
-//        mainFoodAdapter.submitList(list)
-    }
-
-    private fun getSideDishList(list: List<SideDish>) {
-//        binding.rvSideDish.adapter = sideDishAdapter
-//        sideDishAdapter.submitList(list)
     }
 
     private fun onDeleteImage(){
@@ -310,13 +233,6 @@ internal class FeedWriteActivity : BaseActivity<ActivityFeedWriteBinding, FeedWr
         imageUploadId = uploadResponse.id
         simpleDialog("Success", "이미지 등록 완료", AlertDialog.SUCCESS_TYPE)
     }
-
-    override fun onClick(v: View?) {
-        when(v) {
-//            binding.btnFeedUpdate -> observe(viewModel.tempLogin()) {}
-        }
-    }
-
 
     companion object {
         fun getIntent(activity: AppCompatActivity) = Intent(activity, FeedWriteActivity::class.java)

@@ -58,7 +58,7 @@
                 android:background="@drawable/edit_text_bg"
                 android:gravity="center_vertical"
                 android:paddingHorizontal="13dp"
-                bind:stripHtmlText="@{viewModel.selectedLocationItem.title}"
+                bind:stripHtmlText="@{viewModel.selectedLocationItem.name}"
                 android:hint="@string/restaurant_name_hint"
                 android:textColorHint="@color/gray_05"
                 android:fontFamily="@font/spoqa_hans_sans_regular"
@@ -77,7 +77,7 @@
                 app:layout_constraintBottom_toBottomOf="@id/et_search_container"
                 app:layout_constraintEnd_toStartOf="@id/iv_search_restaurant_name"
                 android:onClick="@{()->viewModel.onErasePlaceNameClick()}"
-                android:visibility='@{viewModel.placeName!=null &amp;&amp; viewModel.placeName != ""? View.VISIBLE: View.GONE}'
+                android:visibility='@{viewModel.selectedLocationItem.name !=null &amp;&amp; viewModel.selectedLocationItem.name != ""? View.VISIBLE: View.GONE}'
                 android:contentDescription="@string/erase" />
 
             <ImageView

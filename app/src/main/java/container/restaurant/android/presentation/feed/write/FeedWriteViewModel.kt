@@ -1,6 +1,7 @@
 package container.restaurant.android.presentation.feed.write
 
 import androidx.lifecycle.*
+import com.naver.maps.geometry.Tm128
 import container.restaurant.android.data.*
 import container.restaurant.android.data.repository.FeedWriteRepository
 import container.restaurant.android.data.request.FeedWriteRequest
@@ -35,12 +36,9 @@ internal class FeedWriteViewModel(private val feedWriteRepository: FeedWriteRepo
         MutableLiveData<List<SearchLocationResponse.Item>>()
     val searchLocationList: LiveData<List<SearchLocationResponse.Item>> = _searchLocationList
 
-    private val _selectedLocationItem = MutableLiveData<SearchLocationResponse.Item>()
-    val selectedLocationItem: LiveData<SearchLocationResponse.Item> = _selectedLocationItem
-
-    // 식당 검색 결과 선택 시 바뀌는 이름
-    private val _placeName: MutableLiveData<String> = MutableLiveData()
-    val placeName: LiveData<String> = _placeName
+    // 식당 검색 결과 선택 시 바뀌는 아이템
+    private val _selectedLocationItem = MutableLiveData<FeedWriteRequest.RestaurantCreateDto?>()
+    val selectedLocationItem: LiveData<FeedWriteRequest.RestaurantCreateDto?> = _selectedLocationItem
 
     // 검색창에 입력이 일어날 때마다 바뀌는 이름
     val searchPlaceName: MutableLiveData<String> = MutableLiveData()
@@ -67,7 +65,7 @@ internal class FeedWriteViewModel(private val feedWriteRepository: FeedWriteRepo
     val content = MutableLiveData<String>()
 
     fun erasePlaceName() {
-        _placeName.value = ""
+        _selectedLocationItem.value = null
     }
 
     fun makeSearchResultEmpty() {
@@ -160,14 +158,13 @@ internal class FeedWriteViewModel(private val feedWriteRepository: FeedWriteRepo
     val isSearchResultItemClicked: LiveData<Event<Boolean>> = _isSearchResultItemClicked
 
     override fun onSearchResultItemClick(item: SearchLocationResponse.Item) {
-//        _placeName.value = item.title
-        _selectedLocationItem.value = item
-        val geoPoint = GeoTrans.convert(GeoTrans.KATEC, GeoTrans.GEO, GeoPoint(item.mapx.toDouble(), item.mapy.toDouble()))
-        val tmPoint = GeoTrans.convert(GeoTrans.KATEC, GeoTrans.TM, GeoPoint(item.mapx.toDouble(), item.mapy.toDouble()))
-        Timber.d("katec to geo ${geoPoint.x},${geoPoint.y}")
-        Timber.d("katec to tm ${tmPoint.x},${tmPoint.y}")
-//        Timber.d("katec to grs80 ${GeoTrans.convert(GeoTrans.KATEC, GeoTrans.GRS80, GeoPoint(item.mapx.toDouble(), item.mapy.toDouble()))}")
-        Timber.d("selected location item : $item")
+        val latLng = Tm128(item.mapx.toDouble(), item.mapy.toDouble()).toLatLng()
+        _selectedLocationItem.value = FeedWriteRequest.RestaurantCreateDto(
+            item.title,
+            item.address,
+            latLng.latitude,
+            latLng.longitude
+        )
         _isSearchResultItemClicked.value = Event(true)
     }
 
