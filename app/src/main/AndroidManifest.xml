@@ -11,16 +11,17 @@
     <application
         android:name=".ContainerRestaurantApp"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_app_icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         android:usesCleartextTraffic="true"
         tools:replace="android:theme">
-        <activity android:name=".presentation.onBoarding.OnBoardingActivity"></activity>
+        <activity android:name=".presentation.onBoarding.OnBoardingActivity" />
         <activity android:name=".presentation.feed.detail.FeedDetailActivity" />
-        <activity android:name=".presentation.SplashActivity">
+        <activity android:name=".presentation.SplashActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
