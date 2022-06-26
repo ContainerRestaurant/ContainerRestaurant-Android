@@ -6,15 +6,18 @@ import androidx.lifecycle.ViewModel
 import com.google.android.material.tabs.TabLayout
 import container.restaurant.android.data.FeedCategory
 import container.restaurant.android.data.SortingCategory
+import container.restaurant.android.presentation.base.BaseViewModel
 import container.restaurant.android.util.RecyclerViewItemClickListeners
 
-internal class FeedExploreViewModel : ViewModel(),
+internal class FeedExploreViewModel : BaseViewModel(),
     RecyclerViewItemClickListeners.SortingCategoryItemClickListener {
 
     private val _sortingCategoryList: MutableLiveData<List<SortingCategory>> = MutableLiveData(
         SortingCategory.values().toList()
     )
     val sortingCategoryList: LiveData<List<SortingCategory>> = _sortingCategoryList
+
+    val selectedSortingCategory = MutableLiveData<SortingCategory>()
 
     val feedCategories = FeedCategory.values()
 
@@ -35,11 +38,7 @@ internal class FeedExploreViewModel : ViewModel(),
         }
     }
 
-    override fun onSortingCategoryItemClick(adapterPosition: Int) {
-        if(sortingCategoryList.value!=null){
-            for((index, category) in _sortingCategoryList.value!!.withIndex()) {
-                category.isItemSelected.value = index == adapterPosition
-            }
-        }
+    override fun onSortingCategoryItemClick(sortingCategory: SortingCategory) {
+        selectedSortingCategory.value = sortingCategory
     }
 }

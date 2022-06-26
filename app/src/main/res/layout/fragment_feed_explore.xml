@@ -40,29 +40,31 @@
             app:tabIndicator="@color/gray_07"
             app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_feed_sort"
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout_feed_sort_type"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="16dp"
-            android:layout_marginTop="12dp"
-            android:clipChildren="false"
+            android:paddingVertical="6dp"
+            app:tabIndicatorHeight="0dp"
+            app:tabMode="scrollable"
+            app:tabMinWidth="0dp"
+            app:tabGravity="center"
+            app:tabPaddingEnd="0dp"
+            app:tabPaddingStart="0dp"
+            app:tabPaddingTop="0dp"
+            app:tabPaddingBottom="0dp"
+            app:tabPadding="0dp"
+            app:tabRippleColor="@android:color/transparent"
+            android:paddingHorizontal="14dp"
             android:clipToPadding="false"
-            android:orientation="horizontal"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:dino_itemLayout="@{@layout/item_sort}"
-            app:dino_items="@{viewModel.sortingCategoryList}"
-            app:dino_vm="@{viewModel}"
-            tools:listitem="@layout/item_sort"
-            app:layout_constraintTop_toBottomOf="@+id/tab_layout_feed_type" />
+            app:layout_constraintTop_toBottomOf="@+id/tab_layout_feed_type"/>
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/pager_feed"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="10dp"
             android:layout_marginHorizontal="8dp"
-            app:layout_constraintTop_toBottomOf="@+id/rv_feed_sort"
+            app:layout_constraintTop_toBottomOf="@+id/tab_layout_feed_sort_type"
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

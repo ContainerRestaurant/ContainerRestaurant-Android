@@ -2,12 +2,18 @@ package container.restaurant.android.util
 
 import android.content.Context
 import android.widget.Toast
+import androidx.databinding.ViewDataBinding
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.whenCreated
 import com.skydoves.sandwich.ApiResponse
 import com.skydoves.sandwich.suspendOnError
 import com.skydoves.sandwich.suspendOnException
 import com.skydoves.sandwich.suspendOnSuccess
 import container.restaurant.android.R
+import container.restaurant.android.presentation.base.BaseFragment
+import container.restaurant.android.presentation.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -77,4 +83,23 @@ fun toastShortOfFailMessage(context: Context, message: String) {
 fun toastLongOfFailMessage(context: Context, message: String) {
     val failFullMessage = context.getString(R.string.failed_message, message)
     toastLong(context, failFullMessage)
+}
+
+/** 프래그먼트가 생성된 후 데이터를 관찰하기 위함(ex. viewpager2 사용시)
+ *
+ * @param fragment 해당 BaseFragment(뷰모델을 포함하고 있음)
+ * @param fragmentActivity 액티비티
+ * @param observeWithViewModel 옵저빙을 실행할 내용
+ */
+fun <T : BaseFragment<out ViewDataBinding, out R>, R : BaseViewModel>
+        observeFragmentData(
+    fragment: T,
+    fragmentActivity: FragmentActivity,
+    observeWithViewModel: R.() -> Unit
+) {
+    fragmentActivity.lifecycleScope.launchWhenCreated {
+        fragment.whenCreated {
+            observeWithViewModel(fragment.viewModel)
+        }
+    }
 }

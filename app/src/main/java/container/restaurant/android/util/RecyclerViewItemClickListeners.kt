@@ -1,6 +1,7 @@
 package container.restaurant.android.util
 
 import container.restaurant.android.data.CategorySelection
+import container.restaurant.android.data.SortingCategory
 import container.restaurant.android.data.common.CommentReply
 import container.restaurant.android.data.response.SearchLocationResponse
 import container.restaurant.android.presentation.feed.item.CommentReplyItem
@@ -18,7 +19,7 @@ interface RecyclerViewItemClickListeners {
         fun onSearchResultItemClick(item: SearchLocationResponse.Item)
     }
     interface SortingCategoryItemClickListener {
-        fun onSortingCategoryItemClick(adapterPosition: Int)
+        fun onSortingCategoryItemClick(sortingCategory: SortingCategory)
     }
     interface ExploreFeedItemClickListener {
         fun onExploreFeedItemClick(feedId: Int)

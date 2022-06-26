@@ -11,6 +11,7 @@
         <entry key="app/src/main/res/layout/fragment_privacy_policy.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_terms_of_service.xml" value="0.315625" />
         <entry key="app/src/main/res/layout/item_category_selection.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/item_sort.xml" value="0.2346014492753623" />
       </map>
     </option>
   </component>

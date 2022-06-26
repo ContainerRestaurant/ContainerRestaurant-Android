@@ -15,11 +15,11 @@ enum class FoodCategory(val menuKorean: String) {
 }
 
 
-enum class SortingCategory(val title: String, var isItemSelected: MutableLiveData<Boolean>, val sort: String) {
-    LATEST("최신순", MutableLiveData(true), "createdDate"),
-    LIKE("좋아요 많은 순", MutableLiveData(false), "likeCount"),
-    EASY("난이도 낮은 순", MutableLiveData(false), "difficulty"),
-    HARD("난이도 높은 순", MutableLiveData(false), "difficulty")
+enum class SortingCategory(val title: String, val sort: String) {
+    LATEST("최신순", "createdDate"),
+    LIKE("좋아요 많은 순", "likeCount"),
+    EASY("난이도 낮은 순", "difficulty"),
+    HARD("난이도 높은 순", "difficulty")
     ;
 }
 
