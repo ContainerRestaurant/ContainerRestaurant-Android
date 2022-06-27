@@ -21,14 +21,15 @@ internal class FeedCategoryViewModel(
         MutableLiveData()
     val feedList: LiveData<List<FeedPreviewItem>> = _feedList
 
-    val selectedFeedCategory = MutableLiveData(SortingCategory.LATEST)
+    val selectedSortingCategory = MutableLiveData(SortingCategory.LATEST)
 
     var selectedFeedId: Int = -1
 
-    suspend fun getFeedList(tokenBearer: String, sortingCategory: SortingCategory, onGetSuccess: () -> Unit, onGetFail: () -> Unit) {
+    suspend fun getFeedList(tokenBearer: String, onGetSuccess: () -> Unit, onGetFail: () -> Unit) {
         val categoryName =
             if (feedCategory.name == FeedCategory.ALL.name) null
             else feedCategory.name
+        val sortingCategory = selectedSortingCategory.value ?: SortingCategory.LATEST
         feedExploreRepository.getFeedList(tokenBearer, categoryName, sortingCategory, 0)
             .collect { response ->
                 handleApiResponse(

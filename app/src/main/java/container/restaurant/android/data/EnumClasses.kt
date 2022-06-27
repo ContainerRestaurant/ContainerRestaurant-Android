@@ -17,10 +17,20 @@ enum class FoodCategory(val menuKorean: String) {
 
 enum class SortingCategory(val title: String, val sort: String) {
     LATEST("최신순", "createdDate"),
-    LIKE("좋아요 많은 순", "likeCount"),
-    EASY("난이도 낮은 순", "difficulty"),
-    HARD("난이도 높은 순", "difficulty")
+    LIKE("좋아요 많은 순", "likeCount,DESC"),
+    EASY("난이도 낮은 순", "difficulty,ASC"),
+    HARD("난이도 높은 순", "difficulty,DESC")
     ;
+    companion object {
+        fun getInstanceByTitle(title: String?): SortingCategory? =
+            when(title) {
+                LATEST.title -> LATEST
+                LIKE.title -> LIKE
+                EASY.title -> EASY
+                HARD.title -> HARD
+                else -> null
+            }
+    }
 }
 
 internal enum class FeedCategory(val menuKorean: String, var isItemSelected: MutableLiveData<Boolean>) {

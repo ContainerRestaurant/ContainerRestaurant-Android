@@ -48,10 +48,10 @@ internal class FeedCategoryFragment : BaseFragment<FragmentFeedCategoryBinding, 
             val tokenBearer = SharedPrefUtil.getString(requireContext()) { TOKEN_BEARER }
             viewModel.getFeedList(
                 tokenBearer,
-                SortingCategory.LATEST,
                 onGetSuccess = {
                     if (isRefreshMode) {
                         viewDataBinding.swipeRefreshLayoutFeedCategory.isRefreshing = false
+                        viewDataBinding.rvContainerFeed.smoothScrollToPosition(0)
                     }
                 },
                 onGetFail = {
@@ -82,6 +82,10 @@ internal class FeedCategoryFragment : BaseFragment<FragmentFeedCategoryBinding, 
                     it.likeCnt.value = it.likeCnt.value?.plus(1)
                     likeFeed(it.feedPreviewDto.id, it.isLike, it.likeCnt)
                 }
+            }
+
+            selectedSortingCategory.observe(viewLifecycleOwner) {
+                getFeedList(true)
             }
         }
     }
