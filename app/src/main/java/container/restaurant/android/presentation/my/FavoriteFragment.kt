@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import container.restaurant.android.R
 import container.restaurant.android.databinding.FragmentFavoriteBinding
 import container.restaurant.android.presentation.base.BaseFragment
+import container.restaurant.android.util.SharedPrefUtil
 import container.restaurant.android.util.observe
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -22,6 +24,7 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding, MyViewModel>() {
 
         setBindItem()
         subscribeUi()
+        getFavoriteFragment()
     }
 
     private fun setBindItem() {
@@ -36,6 +39,13 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding, MyViewModel>() {
         with(viewModel) {
             observe(viewLoading, ::loadingCheck)
             observe(getErrorMsg, ::errorDialog)
+        }
+    }
+
+    private fun getFavoriteFragment() {
+        lifecycleScope.launchWhenCreated {
+            val tokenBearer = SharedPrefUtil.getString(requireContext()) { TOKEN_BEARER }
+            viewModel.getFavoriteRestaurant(tokenBearer)
         }
     }
 }

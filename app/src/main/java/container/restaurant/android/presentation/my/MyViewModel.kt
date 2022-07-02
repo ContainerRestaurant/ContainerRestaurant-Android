@@ -6,10 +6,12 @@ import androidx.lifecycle.MutableLiveData
 import com.skydoves.sandwich.StatusCode
 import container.restaurant.android.data.repository.AuthRepository
 import container.restaurant.android.data.repository.MyRepository
+import container.restaurant.android.data.response.FavoriteRestaurantResponse
 import container.restaurant.android.data.response.FeedListResponse
 import container.restaurant.android.data.response.UserInfoResponse
 import container.restaurant.android.presentation.base.BaseViewModel
 import container.restaurant.android.presentation.feed.item.FeedPreviewItem
+import container.restaurant.android.presentation.my.item.FavoriteRestaurantItem
 import container.restaurant.android.util.Event
 import container.restaurant.android.util.RecyclerViewItemClickListeners
 import container.restaurant.android.util.SingleLiveEvent
@@ -68,6 +70,9 @@ class MyViewModel(private val authRepository: AuthRepository, private val myRepo
         MutableLiveData()
     val myScrapFeedList: LiveData<List<FeedPreviewItem>> =
         _myScrapFeedList
+
+    private val _favoriteRestaurantList: MutableLiveData<List<FavoriteRestaurantItem>> = MutableLiveData()
+    val favoriteRestaurantList: LiveData<List<FavoriteRestaurantItem>> = _favoriteRestaurantList
 
 
     init {
@@ -266,6 +271,22 @@ class MyViewModel(private val authRepository: AuthRepository, private val myRepo
                     onException = {
                         Timber.d("it.message : ${it.message}")
                         Timber.d("it.exception : ${it.exception}")
+                    }
+                )
+            }
+    }
+
+    suspend fun getFavoriteRestaurant(tokenBearer: String) {
+        myRepository.getFavoriteRestaurant(tokenBearer)
+            .collect { response ->
+                handleApiResponse(
+                    response = response,
+                    onSuccess = {
+                        _favoriteRestaurantList.value =
+                            it.data?.embedded?.favoriteRestaurantList?.map { favoriteRestaurant ->
+                                FavoriteRestaurantItem(favoriteRestaurant)
+                            }
+                        Timber.d("favoriteRestaurantList : ${favoriteRestaurantList.value}")
                     }
                 )
             }

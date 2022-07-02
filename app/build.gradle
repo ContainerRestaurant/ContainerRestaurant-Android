@@ -134,6 +134,9 @@ dependencies {
     // rating bar
     implementation 'com.hedgehog.ratingbar:app:1.1.2'
 
+    // float rating bar
+    implementation 'com.github.ome450901:SimpleRatingBar:1.5.1'
+
     // lottie
     implementation 'com.airbnb.android:lottie:3.0.7'
 

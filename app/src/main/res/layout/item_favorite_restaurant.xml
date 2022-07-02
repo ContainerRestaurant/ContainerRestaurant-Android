@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="item"
+            type="container.restaurant.android.presentation.my.item.FavoriteRestaurantItem" />
+        <import type="android.view.View"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_favorite_restaurant_restaurant_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="16dp"
+            android:layout_marginStart="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            >
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_badge_filled"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:contentDescription="@string/isContainerFriendlyRestaurant"
+                android:visibility="@{item.favoriteRestaurant.restaurant.isContainerFriendly == true ? View.VISIBLE:View.GONE}"
+                android:elevation="3dp"
+                android:layout_margin="4dp"/>
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_view_favorite_restaurant_restaurant_image"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="@string/restaurant_take_out_img"
+                    bind:imageUrlWithBaseUrl="@{item.favoriteRestaurant.restaurant.imagePath}"
+                    tools:src="@mipmap/ic_app_icon"
+                    />
+            </androidx.cardview.widget.CardView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/tv_favorite_restaurant_restaurant_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{item.favoriteRestaurant.restaurant.name}"
+            android:includeFontPadding="false"
+            app:layout_constraintVertical_chainStyle="packed"
+            android:textAppearance="@style/TextAppearance.App.Body2"
+            tools:text="오디너리핏"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/rating_bar_favorite_restaurant_difficulty"
+            app:layout_constraintStart_toEndOf="@id/cl_favorite_restaurant_restaurant_image"
+            android:layout_marginStart="8dp"/>
+        <com.willy.ratingbar.BaseRatingBar
+            android:id="@+id/rating_bar_favorite_restaurant_difficulty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            app:layout_constraintStart_toStartOf="@id/tv_favorite_restaurant_restaurant_name"
+            app:layout_constraintBottom_toTopOf="@id/card_view_favorite_restaurant_best_menu1"
+            app:layout_constraintTop_toBottomOf="@id/tv_favorite_restaurant_restaurant_name"
+            tools:srb_rating="3.0"
+            app:srb_isIndicator="true"
+            app:srb_starWidth="16dp"
+            app:srb_starHeight="16dp"
+            app:starCount="5"
+            app:srb_numStars="5"
+            bind:doubleToFloat="@{item.favoriteRestaurant.restaurant.difficultyAvg}"
+            app:srb_drawableEmpty="@drawable/ic_favorite_restaurant_rating_empty"
+            app:srb_drawableFilled="@drawable/ic_favorite_restaurant_rating_filled"
+            app:srb_stepSize="0.1"
+            app:srb_starPadding="1dp"
+            app:starImageHeight="16dp"
+            app:starImageWidth="16dp"/>
+
+        <TextView
+            android:id="@+id/tv_favorite_restaurant_difficulty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/rating_bar_favorite_restaurant_difficulty"
+            app:layout_constraintBottom_toBottomOf="@id/rating_bar_favorite_restaurant_difficulty"
+            app:layout_constraintStart_toEndOf="@id/rating_bar_favorite_restaurant_difficulty"
+            android:text="@{item.favoriteRestaurant.restaurant.difficultyAvg + ``}"
+            tools:text="3.0"
+            android:textColor="@color/gray_07"
+            android:textAppearance="@style/TextAppearance.App.Caption1"
+            android:includeFontPadding="false"
+            android:layout_marginStart="4dp"/>
+
+        <View
+            android:id="@+id/divider_favorite_restaurant_rating"
+            android:layout_width="1dp"
+            android:layout_height="12dp"
+            app:layout_constraintTop_toTopOf="@id/rating_bar_favorite_restaurant_difficulty"
+            app:layout_constraintBottom_toBottomOf="@id/rating_bar_favorite_restaurant_difficulty"
+            app:layout_constraintStart_toEndOf="@id/tv_favorite_restaurant_difficulty"
+            android:layout_marginStart="8dp"
+            android:background="@color/gray_04"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="999"
+            android:text="@{item.favoriteRestaurant.restaurant.feedCount + ``}"
+            android:textColor="@color/green_02"
+            android:textAppearance="@style/TextAppearance.App.Caption1"
+            app:layout_constraintStart_toEndOf="@id/divider_favorite_restaurant_rating"
+            app:layout_constraintTop_toTopOf="@id/rating_bar_favorite_restaurant_difficulty"
+            app:layout_constraintBottom_toBottomOf="@id/rating_bar_favorite_restaurant_difficulty"
+            android:layout_marginStart="8dp"
+            android:drawablePadding="4dp"
+            app:drawableStartCompat="@drawable/ic_feed_count" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_view_favorite_restaurant_best_menu1"
+            app:layout_constraintTop_toBottomOf="@id/rating_bar_favorite_restaurant_difficulty"
+            app:layout_constraintStart_toStartOf="@id/tv_favorite_restaurant_restaurant_name"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="6dp"
+            app:cardBackgroundColor="@color/gray_02"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="카페"
+                android:includeFontPadding="false"
+                android:textAppearance="@style/TextAppearance.App.Caption4"
+                android:textColor="@color/gray_05"
+                bind:firstBestMenuName="@{item.favoriteRestaurant}"
+                android:layout_marginHorizontal="6dp"
+                android:layout_marginVertical="3dp"/>
+        </androidx.cardview.widget.CardView>
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_view_favorite_restaurant_best_menu2"
+            app:layout_constraintTop_toTopOf="@id/card_view_favorite_restaurant_best_menu1"
+            app:layout_constraintStart_toEndOf="@id/card_view_favorite_restaurant_best_menu1"
+            android:layout_marginStart="4dp"
+            app:cardBackgroundColor="@color/gray_02"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="샌드위치"
+                bind:secondBestMenuName="@{item.favoriteRestaurant}"
+                android:includeFontPadding="false"
+                android:textAppearance="@style/TextAppearance.App.Caption4"
+                android:textColor="@color/gray_05"
+                android:layout_marginHorizontal="6dp"
+                android:layout_marginVertical="3dp"/>
+        </androidx.cardview.widget.CardView>
+
+        <ImageView
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:clickable="false"
+            android:padding="12dp"
+            bind:isActivated="@{item.favoriteRestaurant.restaurant.isFavorite}"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:src="@drawable/selector_favorite_restaurant"
+            android:contentDescription="@string/is_favorite_restaurant" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

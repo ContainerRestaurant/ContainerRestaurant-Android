@@ -7,6 +7,7 @@ import android.text.SpannableStringBuilder
 import android.text.style.StyleSpan
 import android.view.Gravity
 import android.view.View
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
@@ -19,7 +20,9 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.tabs.TabLayout
 import com.hedgehog.ratingbar.RatingBar
+import com.willy.ratingbar.BaseRatingBar
 import container.restaurant.android.R
+import container.restaurant.android.data.response.FavoriteRestaurantResponse
 import container.restaurant.android.di.BASE_URL
 import de.hdodenhof.circleimageview.CircleImageView
 import timber.log.Timber
@@ -294,5 +297,36 @@ fun TextView.setDifficultyText(rating: Int) {
 fun View.setIsActivated(isActivated: Boolean?) {
     isActivated?.let {
         this.isActivated = it
+    }
+}
+
+@BindingAdapter("firstBestMenuName")
+fun TextView.setFirstBestMenuName(favoriteRestaurant: FavoriteRestaurantResponse.FavoriteRestaurantList.FavoriteRestaurant?) {
+    favoriteRestaurant?.let {
+        if(it.restaurant.bestMenu.isNotEmpty()) {
+            text = it.restaurant.bestMenu[0]
+        }
+        else {
+            visibility = View.GONE
+        }
+    }
+}
+
+@BindingAdapter("secondBestMenuName")
+fun TextView.setSecondBestMenuName(favoriteRestaurant: FavoriteRestaurantResponse.FavoriteRestaurantList.FavoriteRestaurant?) {
+    favoriteRestaurant?.let {
+        if(it.restaurant.bestMenu.size > 1) {
+            text = it.restaurant.bestMenu[1]
+        }
+        else {
+            visibility = View.GONE
+        }
+    }
+}
+
+@BindingAdapter("doubleToFloat")
+fun BaseRatingBar.setFloatByDouble(double: Double?) {
+    double?.let {
+        rating = it.toFloat()
     }
 }

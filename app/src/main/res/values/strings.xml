@@ -157,5 +157,8 @@
     <string name="failed_message">%1$s에 실패하였습니다.</string>
     <string name="show_more">더보기</string>
     <string name="user_icon">프로필 이미지</string>
+    <string name="isContainerFriendlyRestaurant">다회용기 환영 식당</string>
+    <string name="restaurant_take_out_img">포장 이미지</string>
+    <string name="is_favorite_restaurant">찜한 식당</string>
 
 </resources>

@@ -33,9 +33,6 @@ interface MyService {
     @GET("/api/feed/user/{id}/scrap")
     suspend fun getMyScrapFeed(@Header("Cookie") cookie: String, @Path("id")id: Int) : ApiResponse<MyFeedResponse>
 
-    @GET("/api/favorite/restaurant")
-    suspend fun getFavoriteRestaurant(@Header("Cookie") cookie: String) : ApiResponse<MyFavoriteResponse>
-
     @GET("/api/user/{userId}")
     suspend fun userInfo(
         @Path("userId") userId: Int
@@ -56,7 +53,7 @@ interface MyService {
     suspend fun myScrapFeed(@Header("Authorization") tokenBearer: String, @Path("userId")userId:Int): ApiResponse<FeedListResponse>
 
     @GET("/api/favorite/restaurant")
-    suspend fun favoriteRestaurant()
+    suspend fun getFavoriteRestaurant(@Header("Authorization") tokenBearer: String): ApiResponse<FavoriteRestaurantResponse>
 
     @POST("/api/like/feed/{feedId}")
     suspend fun likeFeed(
